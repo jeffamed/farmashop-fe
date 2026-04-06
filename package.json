@@ -16,6 +16,8 @@
     "format": "prettier --write --experimental-cli src/"
   },
   "dependencies": {
+    "@n8n/chat": "^1.14.0",
+    "axios": "^1.13.6",
     "pinia": "^3.0.4",
     "vue": "^3.5.28",
     "vue-router": "^5.0.2"
