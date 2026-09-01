@@ -149,8 +149,36 @@ import '@n8n/chat/style.css'
 import { createChat } from '@n8n/chat'
 import { useSidebar } from '@/composables/useSidebar'
 import { computed, onMounted } from 'vue'
-import { ChevronDownIcon, GridIcon, HorizontalDots } from '@/components/icons'
+import {
+  BoxCubeIcon,
+  ChevronDownIcon,
+  FolderIcon,
+  GridIcon,
+  HorizontalDots,
+  TableIcon,
+  UserGroupIcon,
+} from '@/components/icons'
 import { useRoute } from 'vue-router'
+import type { Component } from 'vue'
+
+interface MenuSubItem {
+  name: string
+  path: string
+  pathname: string
+}
+
+interface MenuItem {
+  icon: Component
+  name: string
+  path?: string
+  pathname?: string
+  subItems?: MenuSubItem[]
+}
+
+interface MenuGroup {
+  title: string
+  items: MenuItem[]
+}
 
 onMounted(() => {
   createChat({
@@ -170,7 +198,7 @@ onMounted(() => {
 })
 const route = useRoute()
 const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar()
-const menuGroups = [
+const menuGroups: MenuGroup[] = [
   {
     title: 'Menu',
     items: [
@@ -180,14 +208,97 @@ const menuGroups = [
         pathname: 'home',
         path: '/',
       },
+    ],
+  },
+  {
+    title: 'Mantenimiento',
+    items: [
       {
-        icon: GridIcon,
-        name: 'Inventario',
+        icon: BoxCubeIcon,
+        name: 'Almacen',
         subItems: [
           {
-            name: 'Product',
-            path: '/product',
-            pathname: 'product',
+            name: 'Productos',
+            path: '/products',
+            pathname: 'products',
+          },
+          {
+            name: 'Ubicaciones',
+            path: '/locations',
+            pathname: 'locations',
+          },
+          {
+            name: 'Tipos',
+            path: '/type-products',
+            pathname: 'type-products',
+          },
+          {
+            name: 'Presentaciones',
+            path: '/presentations',
+            pathname: 'presentations',
+          },
+          {
+            name: 'Usos',
+            path: '/usages',
+            pathname: 'usages',
+          },
+          {
+            name: 'Laboratorios',
+            path: '/laboratories',
+            pathname: 'laboratories',
+          },
+        ],
+      },
+      {
+        icon: FolderIcon,
+        name: 'Compras',
+        subItems: [
+          {
+            name: 'Ordenes de compra',
+            path: '/orders',
+            pathname: 'orders',
+          },
+          {
+            name: 'Proveedores',
+            path: '/suppliers',
+            pathname: 'suppliers',
+          },
+          {
+            name: 'Devoluciones',
+            path: '/reimbursements',
+            pathname: 'reimbursements',
+          },
+        ],
+      },
+      {
+        icon: TableIcon,
+        name: 'Ventas',
+        subItems: [
+          {
+            name: 'Registro de ventas',
+            path: '/sales',
+            pathname: 'sales',
+          },
+          {
+            name: 'Clientes',
+            path: '/customers',
+            pathname: 'customers',
+          },
+        ],
+      },
+      {
+        icon: UserGroupIcon,
+        name: 'Acceso',
+        subItems: [
+          {
+            name: 'Usuarios',
+            path: '/users',
+            pathname: 'users',
+          },
+          {
+            name: 'Roles',
+            path: '/roles',
+            pathname: 'roles',
           },
         ],
       },
@@ -211,7 +322,7 @@ const isAnySubmenuRouteActive = computed(() => {
 
 const isSubmenuOpen = (groupIndex: number, itemIndex: number): boolean => {
   const key = `${groupIndex}-${itemIndex}`
-  const subItems = menuGroups[groupIndex].items[itemIndex].subItems
+  const subItems = menuGroups[groupIndex]?.items[itemIndex]?.subItems
 
   return (
     openSubmenu.value === key ||

@@ -1,54 +1,102 @@
-# farmashop-fe
+# Farmashop Frontend
 
-This template should help get you started developing with Vue 3 in Vite.
+Panel administrativo web para la gestión de Farmashop. Centraliza la operación de
+inventario, compras, ventas y administración de usuarios, y se conecta a la API de
+Farmashop mediante HTTP.
 
-## Recommended IDE Setup
+## Módulos disponibles
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- **Inicio:** tablero principal.
+- **Almacén:** productos, ubicaciones, tipos de producto, presentaciones, usos y
+  laboratorios.
+- **Compras:** órdenes, proveedores y reembolsos.
+- **Ventas:** ventas y clientes.
+- **Acceso:** usuarios y roles.
+- **Asistente FarmIA:** chat integrado mediante un webhook de n8n.
 
-## Recommended Browser Setup
+La interfaz incluye navegación lateral adaptable, tema claro/oscuro persistido en el
+navegador y una vista para rutas no encontradas.
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+## Tecnologías
 
-## Type Support for `.vue` Imports in TS
+| Área | Tecnologías |
+| --- | --- |
+| Framework | Vue 3, Composition API y Single File Components |
+| Lenguaje | TypeScript |
+| Construcción y desarrollo | Vite 7 y `@vitejs/plugin-vue` |
+| Estilos | Tailwind CSS 4, PostCSS y Autoprefixer |
+| Navegación y estado | Vue Router 5 y Pinia |
+| HTTP | Axios, con credenciales, token Bearer e interceptores de errores |
+| Asistente | `@n8n/chat` conectado a n8n |
+| Pruebas | Vitest, Vue Test Utils y JSDOM |
+| Calidad | ESLint 9, Oxlint y Prettier |
+| Herramientas | Node.js 20.19+ o 22.12+, npm y vue-tsc |
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+## Requisitos
 
-## Customize configuration
+- Node.js `^20.19.0 || >=22.12.0`
+- npm
+- Una instancia accesible de la API de Farmashop
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## Instalación y configuración
 
-## Project Setup
-
-```sh
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+Cree o ajuste el archivo `.env` en la raíz del proyecto con la URL de la API:
 
-```sh
-npm run dev
+```env
+VITE_API_URL=https://farmashop.test
 ```
 
-### Type-Check, Compile and Minify for Production
+`VITE_API_URL` se utiliza como `baseURL` de Axios. Las solicitudes envían cookies
+(`withCredentials`) y, si existe `token` en `localStorage`, agregan el encabezado
+`Authorization: Bearer <token>`.
 
-```sh
-npm run build
+> El webhook de FarmIA está configurado actualmente en
+> `src/components/layout/AppSidebar.vue`. Para usar el asistente en otro entorno,
+> actualice allí su URL de webhook de n8n.
+
+## Scripts
+
+| Comando | Descripción |
+| --- | --- |
+| `npm run dev` | Inicia el servidor de desarrollo con recarga en caliente. |
+| `npm run build` | Ejecuta la verificación de tipos y genera la compilación de producción en `dist/`. |
+| `npm run preview` | Sirve localmente la compilación de producción. |
+| `npm run type-check` | Verifica los tipos de Vue y TypeScript con `vue-tsc`. |
+| `npm run test:unit` | Ejecuta las pruebas unitarias con Vitest. |
+| `npm run lint` | Ejecuta ESLint y Oxlint; ambos scripts corrigen automáticamente los problemas que pueden resolver. |
+| `npm run format` | Formatea los archivos de `src/` con Prettier. |
+
+## Estructura principal
+
+```text
+src/
+├── api/           # Cliente Axios y configuración de API
+├── components/    # Layout, navegación, iconos y componentes compartidos
+├── composables/   # Lógica reutilizable de Vue
+├── stores/        # Estado global con Pinia
+├── router/        # Rutas de la aplicación
+├── services/      # Servicios de dominio y llamadas a API
+├── types/         # Tipos de TypeScript
+├── views/         # Dashboard y páginas generales
+└── [módulos]/     # Productos, ventas, compras, usuarios, etc.
 ```
 
-### Run Unit Tests with [Vitest](https://vitest.dev/)
+## Rutas
 
-```sh
-npm run test:unit
-```
+| Ruta | Módulo |
+| --- | --- |
+| `/` | Inicio |
+| `/products`, `/locations`, `/type-products`, `/presentations`, `/usages`, `/laboratories` | Almacén |
+| `/orders`, `/suppliers`, `/reimbursements` | Compras |
+| `/sales`, `/customers` | Ventas |
+| `/users`, `/roles` | Acceso |
 
-### Lint with [ESLint](https://eslint.org/)
+Las rutas no definidas muestran la página `NotFound`.
 
-```sh
-npm run lint
-```
+## Desarrollo
+
+Se recomienda Visual Studio Code con la extensión [Vue - Official](https://marketplace.visualstudio.com/items?itemName=Vue.volar). El proyecto utiliza el alias `@` para importar desde `src`, por ejemplo: `@/components/layout/AdminLayout.vue`.
