@@ -47,7 +47,7 @@
               <template v-if="isExpanded || isHovered || isMobileOpen">
                 {{ menuGroup.title }}
               </template>
-              <HorizontalDots v-else />
+              <AppIcon v-else name="horizontal-dots" />
             </h2>
             <ul class="flex flex-col gap-4">
               <li v-for="(item, index) in menuGroup.items" :key="item.name">
@@ -70,13 +70,14 @@
                         : 'menu-item-icon-inactive',
                     ]"
                   >
-                    <component :is="item.icon" />
+                    <AppIcon :name="item.icon" />
                   </span>
                   <span v-if="isExpanded || isHovered || isMobileOpen" class="menu-item-text">{{
                     item.name
                   }}</span>
-                  <ChevronDownIcon
+                  <AppIcon
                     v-if="isExpanded || isHovered || isMobileOpen"
+                    name="chevron-down"
                     :class="[
                       'ml-auto w-5 h-5 transition-transform duration-200',
                       {
@@ -101,7 +102,7 @@
                       isActive(item.path) ? 'menu-item-icon-active' : 'menu-item-icon-inactive',
                     ]"
                   >
-                    <component :is="item.icon" />
+                    <AppIcon :name="item.icon" />
                   </span>
                   <span v-if="isExpanded || isHovered || isMobileOpen" class="menu-item-text">{{
                     item.name
@@ -149,17 +150,9 @@ import '@n8n/chat/style.css'
 import { createChat } from '@n8n/chat'
 import { useSidebar } from '@/composables/useSidebar'
 import { computed, onMounted } from 'vue'
-import {
-  BoxCubeIcon,
-  ChevronDownIcon,
-  FolderIcon,
-  GridIcon,
-  HorizontalDots,
-  TableIcon,
-  UserGroupIcon,
-} from '@/components/icons'
+import AppIcon from '@/components/icons/AppIcon.vue'
+import type { IconName } from '@/components/icons/type'
 import { useRoute } from 'vue-router'
-import type { Component } from 'vue'
 
 interface MenuSubItem {
   name: string
@@ -168,7 +161,7 @@ interface MenuSubItem {
 }
 
 interface MenuItem {
-  icon: Component
+  icon: IconName
   name: string
   path?: string
   pathname?: string
@@ -203,7 +196,7 @@ const menuGroups: MenuGroup[] = [
     title: 'Menu',
     items: [
       {
-        icon: GridIcon,
+        icon: 'grid',
         name: 'Dashboard',
         pathname: 'home',
         path: '/',
@@ -214,7 +207,7 @@ const menuGroups: MenuGroup[] = [
     title: 'Mantenimiento',
     items: [
       {
-        icon: BoxCubeIcon,
+        icon: 'box-cube',
         name: 'Almacen',
         subItems: [
           {
@@ -250,7 +243,7 @@ const menuGroups: MenuGroup[] = [
         ],
       },
       {
-        icon: FolderIcon,
+        icon: 'folder',
         name: 'Compras',
         subItems: [
           {
@@ -271,7 +264,7 @@ const menuGroups: MenuGroup[] = [
         ],
       },
       {
-        icon: TableIcon,
+        icon: 'table',
         name: 'Ventas',
         subItems: [
           {
@@ -287,7 +280,7 @@ const menuGroups: MenuGroup[] = [
         ],
       },
       {
-        icon: UserGroupIcon,
+        icon: 'user-group',
         name: 'Acceso',
         subItems: [
           {

@@ -10,7 +10,7 @@
 
       <span class="block mr-1 font-medium text-theme-sm">Musharof </span>
 
-      <ChevronDownIcon :class="{ 'rotate-180': dropdownOpen }" />
+      <AppIcon name="chevron-down" :class="{ 'rotate-180': dropdownOpen }" />
     </button>
 
     <!-- Dropdown Start -->
@@ -34,8 +34,8 @@
             class="flex items-center gap-3 px-3 py-2 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
           >
             <!-- SVG icon would go here -->
-            <component
-              :is="item.icon"
+            <AppIcon
+              :name="item.icon"
               class="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300"
             />
             {{ item.text }}
@@ -47,7 +47,8 @@
         @click="signOut"
         class="flex items-center gap-3 px-3 py-2 mt-3 font-medium text-gray-700 rounded-lg group text-theme-sm hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
       >
-        <LogoutIcon
+        <AppIcon
+          name="logout"
           class="text-gray-500 group-hover:text-gray-700 dark:group-hover:text-gray-300"
         />
         Sign out
@@ -58,7 +59,8 @@
 </template>
 
 <script setup lang="ts">
-import { UserCircleIcon, ChevronDownIcon, LogoutIcon, SettingsIcon, InfoCircleIcon } from '../../icons'
+import AppIcon from '../../icons/AppIcon.vue'
+import type { IconName } from '../../icons/type'
 import { RouterLink } from 'vue-router'
 import { ref, onMounted, onUnmounted } from 'vue'
 
@@ -66,9 +68,9 @@ const dropdownOpen = ref(false)
 const dropdownRef = ref(null)
 
 const menuItems = [
-  { href: '/profile', icon: UserCircleIcon, text: 'Edit profile' },
-  { href: '/chat', icon: SettingsIcon, text: 'Account settings' },
-  { href: '/profile', icon: InfoCircleIcon, text: 'Support' },
+  { href: '/profile', icon: 'user-circle' as IconName, text: 'Edit profile' },
+  { href: '/chat', icon: 'settings' as IconName, text: 'Account settings' },
+  { href: '/profile', icon: 'info-circle' as IconName, text: 'Support' },
 ]
 
 const toggleDropdown = () => {
