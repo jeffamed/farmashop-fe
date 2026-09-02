@@ -1,16 +1,37 @@
+<script setup lang="ts">
+import AdminLayout from '@/components/layout/AdminLayout.vue'
+import PageHeader from '@/components/layout/PageHeader.vue'
+import AppIcon from '@/components/icons/AppIcon.vue'
+import CreateModal from '@/Locations/components/CreateModal.vue'
+import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
+import { ref } from 'vue'
+const title = ref<string>('Ubicaciones')
+</script>
 <template>
   <admin-layout>
     <div class="grid grid-cols-12 gap-4 md:gap-6">
-      <Breadcrumbs
-        :parent-path="{ name: 'Almacen', root: '/locations' }"
-        :current-path="{ name: 'Ubicaciones', root: '/locations' }"
-      />
+      <div class="col-span-12">
+        <Breadcrumbs
+          :parent-path="{ name: 'Almacen', root: '/locations' }"
+          :current-path="{ name: title, root: '/locations' }"
+        />
+        <PageHeader group="Almacén" :title="title" :count="0">
+          <template #actions>
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-full border
+              border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700
+              hover:bg-gray-50 dark:border-gray-700
+              dark:text-gray-300 dark:hover:bg-white/5"
+            >
+              <AppIcon name="download" class="h-4 w-4" />
+              Exportar
+            </button>
+            <CreateModal />
+          </template>
+        </PageHeader>
+      </div>
     </div>
   </admin-layout>
 </template>
-
-<script setup lang="ts">
-import AdminLayout from '@/components/layout/AdminLayout.vue'
-import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
-</script>
 <style scoped></style>
