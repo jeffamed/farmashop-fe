@@ -3,6 +3,8 @@ import AdminLayout from '@/components/layout/AdminLayout.vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
+import RegisterNameModal from '@/components/common/RegisterNameModal.vue'
+
 import { ref } from 'vue'
 const title = ref<string>('Presentaciones')
 </script>
@@ -26,6 +28,7 @@ const title = ref<string>('Presentaciones')
               <AppIcon name="download" class="h-4 w-4" />
               Exportar
             </button>
+            <RegisterNameModal title="Presentación" description="Presentaciones de productos" />
           </template>
         </PageHeader>
       </div>

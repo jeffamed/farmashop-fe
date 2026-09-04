@@ -2,8 +2,8 @@
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
-import CreateModal from '@/Locations/components/CreateModal.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
+import RegisterNameModal from '@/components/common/RegisterNameModal.vue'
 import { ref } from 'vue'
 const title = ref<string>('Ubicaciones')
 </script>
@@ -27,7 +27,7 @@ const title = ref<string>('Ubicaciones')
               <AppIcon name="download" class="h-4 w-4" />
               Exportar
             </button>
-            <CreateModal />
+            <RegisterNameModal title="Ubicación" description="Estantes en el local" />
           </template>
         </PageHeader>
       </div>
