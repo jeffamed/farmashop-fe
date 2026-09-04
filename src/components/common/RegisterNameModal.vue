@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Payload } from '@/services/basicApiService'
 import ModalGlobal from '@/components/common/ModalGlobal.vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
 import { ref } from 'vue'
@@ -10,16 +11,15 @@ interface Props {
 
 const props = defineProps<Props>()
 const emit = defineEmits<{
-  save: [name: string]
+  save: [payload: Payload]
 }>()
-
 
 const show = ref<boolean>(false)
 const name = ref<string>('')
 
 const sendForm = () => {
-  emit('save', name.value)
-  show.value = false
+  emit('save', {name: name.value})
+  resetForm()
 }
 
 const resetForm = () => {

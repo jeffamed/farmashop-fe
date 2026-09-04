@@ -1,21 +1,21 @@
 import axios from "axios";
 
 const BASE_URL = import.meta.env.VITE_API_URL;
-export const api = axios.create({
+export const farmashopApi = axios.create({
   baseURL: BASE_URL,
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
 });
-api.interceptors.request.use(config => {
+farmashopApi.interceptors.request.use((config) => {
   const token = localStorage.getItem('token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
-  return config;
-});
+  return config
+})
 
-api.interceptors.response.use(
+farmashopApi.interceptors.response.use(
   (response) => response,
   (error) => {
     const status = error.response?.status

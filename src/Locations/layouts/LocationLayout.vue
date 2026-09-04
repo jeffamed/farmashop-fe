@@ -6,6 +6,9 @@ import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import RegisterNameModal from '@/components/common/RegisterNameModal.vue'
 import { ref } from 'vue'
 const title = ref<string>('Ubicaciones')
+import { useLocation } from '../composables/useLocation'
+const { createLocation } = useLocation()
+
 </script>
 <template>
   <admin-layout>
@@ -27,7 +30,7 @@ const title = ref<string>('Ubicaciones')
               <AppIcon name="download" class="h-4 w-4" />
               Exportar
             </button>
-            <RegisterNameModal title="Ubicación" description="Estantes en el local" />
+            <RegisterNameModal title="Ubicación" description="Estantes en el local" @save="createLocation.mutate"/>
           </template>
         </PageHeader>
       </div>
