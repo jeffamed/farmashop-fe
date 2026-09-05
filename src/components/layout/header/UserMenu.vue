@@ -8,7 +8,7 @@
         <img src="/images/user/owner.jpg" alt="User" />
       </span>
 
-      <span class="block mr-1 font-medium text-theme-sm">Musharof </span>
+      <span class="block mr-1 font-medium text-theme-sm">{{ full_name }}</span>
 
       <AppIcon name="chevron-down" :class="{ 'rotate-180': dropdownOpen }" />
     </button>
@@ -20,10 +20,10 @@
     >
       <div>
         <span class="block font-medium text-gray-700 text-theme-sm dark:text-gray-400">
-          Musharof Chowdhury
+          {{ full_name }}
         </span>
         <span class="mt-0.5 block text-theme-xs text-gray-500 dark:text-gray-400">
-          randomuser@pimjo.com
+          {{ user?.email }}
         </span>
       </div>
 
@@ -66,7 +66,7 @@ import { useAuth } from '@/composables/useAuth.ts'
 
 const dropdownOpen = ref(false)
 const dropdownRef = ref(null)
-const { logout } = useAuth();
+const { logout, full_name, user } = useAuth();
 
 const menuItems = [
   { href: '/profile', icon: 'user-circle' as IconName, text: 'Edit profile' },

@@ -55,5 +55,6 @@ export const useAuth = () => {
     login,
     logout,
     isAuthenticated: computed(() => !!userQuery.data.value),
+    full_name: computed(() =>  authStore.user?.name + ' ' + authStore.user?.last_name),
   }
 }

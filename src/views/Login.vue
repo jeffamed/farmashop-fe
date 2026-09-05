@@ -104,7 +104,6 @@ const handleSubmit = () => {
               <AppIcon v-if="login.isPending.value" name="spinner" class="h-4 w-4 animate-spin text-white" />
               {{ login.isPending.value ? 'Ingresando...' : 'Iniciar sesión' }}
             </button>
-            <p v-show="login.isError.value"><small>{{ login.error.value }}</small></p>
           </div>
         </form>
       </div>
