@@ -13,6 +13,7 @@ import SaleLayout from '@/Sales/layouts/SaleLayout.vue'
 import CustomerLayout from '@/Customers/layouts/CustomerLayout.vue'
 import UserLayout from '@/Users/layouts/UserLayout.vue'
 import RoleLayout from '@/Roles/layouts/RoleLayout.vue'
+import Login from '@/views/Login.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +22,11 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: Dashboard,
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: Login,
     },
     // Almacen
     {
