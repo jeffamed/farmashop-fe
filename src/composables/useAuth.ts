@@ -3,10 +3,12 @@ import { authService } from '@/services/auth.service.ts'
 import type { LoginPayload } from '@/types/Auth.ts'
 import { useRouter } from 'vue-router'
 import { computed } from 'vue'
+import { useAuthStore } from '@/stores/auth.store.ts'
 
 export const useAuth = () => {
   const queryClient = useQueryClient()
   const router = useRouter()
+  const authStore = useAuthStore()
 
   const userQuery = useQuery({
     queryKey: ['auth-user'],
@@ -15,11 +17,16 @@ export const useAuth = () => {
     staleTime: Infinity
   })
 
+  const handleLogin = async (credentials: LoginPayload) => {
+    await authService.csrfCookie()
+    const { data } = await authService.login(credentials)
+    const user = await authService.me()
+    authStore.setUser(user)
+    //return data
+  }
+
   const login = useMutation({
-    mutationFn: async (credentials: LoginPayload) => {
-      await authService.csrfCookie()
-      return authService.login(credentials)
-    },
+    mutationFn: handleLogin,
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['auth-user'],
@@ -27,10 +34,19 @@ export const useAuth = () => {
     },
   })
 
+  const handleLogout = async () => {
+    await authService.logout()
+    authStore.clearUser()
+  }
+
   const logout = useMutation({
-    mutationFn: authService.logout,
+    mutationFn: handleLogout,
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ['auth-user'] })
+      router.push({ name: 'login' })
+    },
+    onError: (error) => {
+      console.error(error)
     },
   })
 

@@ -9,8 +9,10 @@ export interface Permission {
 }
 
 export interface User {
-  name: string
+  name: string,
+  last_name: string,
   email: string
-  role: string
-  permissions: Permission[]
+  //TODO add role and permissions
+  //role: string
+  //permissions: Permission[]
 }
