@@ -4,6 +4,9 @@ import type { LoginPayload } from '@/types/Auth.ts'
 import { useRouter } from 'vue-router'
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth.store.ts'
+import type { ValidateErrorResponse } from '@/types/ErrorResponse.ts'
+import type { User } from '@/types/Auth.ts'
+import type { AxiosError } from 'axios'
 
 export const useAuth = () => {
   const queryClient = useQueryClient()
@@ -25,7 +28,7 @@ export const useAuth = () => {
     //return data
   }
 
-  const login = useMutation({
+  const login = useMutation<User, AxiosError<ValidateErrorResponse>, LoginPayload>({
     mutationFn: handleLogin,
     onSuccess: () => {
       queryClient.invalidateQueries({

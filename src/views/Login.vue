@@ -10,7 +10,7 @@ const { login } = useAuth()
 
 const form: LoginPayload = reactive({
   email: '',
-  password: ''
+  password: '',
 })
 
 const showPassword = ref(false)
@@ -19,7 +19,7 @@ const handleSubmit = () => {
   login.mutate(form, {
     onSuccess: () => {
       router.push({ name: 'home' })
-    }
+    },
   })
 }
 </script>
@@ -31,9 +31,13 @@ const handleSubmit = () => {
         <img src="/images/logo/auth-logo.svg" alt="Farmashop" class="h-10 w-auto" />
       </div>
 
-      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark sm:p-8">
+      <div
+        class="rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark sm:p-8"
+      >
         <div class="mb-6 text-center">
-          <h3 class="text-title-sm font-semibold text-gray-800 dark:text-white/90">Iniciar sesión</h3>
+          <h3 class="text-title-sm font-semibold text-gray-800 dark:text-white/90">
+            Iniciar sesión
+          </h3>
           <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
             Ingresa tus credenciales para acceder a tu cuenta
           </p>
@@ -44,17 +48,22 @@ const handleSubmit = () => {
           class="mb-5 flex items-start gap-2 rounded-xl border border-error-500/20 bg-error-50 px-4 py-3 text-sm text-error-500 dark:border-error-500/30 dark:bg-error-500/15"
         >
           <AppIcon name="error" class="mt-0.5 h-4 w-4 shrink-0" />
-          <span>Correo electrónico o contraseña incorrectos. Inténtalo nuevamente.</span>
+          <span>{{ login.error.value?.response?.data.message }}</span>
         </div>
 
         <form @submit.prevent="handleSubmit">
           <div class="space-y-5">
             <div>
-              <label for="email" class="block mb-2.5 text-sm font-medium text-gray-800 dark:text-white/90">
+              <label
+                for="email"
+                class="block mb-2.5 text-sm font-medium text-gray-800 dark:text-white/90"
+              >
                 Correo electrónico<span class="text-error-500">*</span>
               </label>
               <div class="relative">
-                <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
+                <span
+                  class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+                >
                   <AppIcon name="mail" class="h-5 w-5" />
                 </span>
                 <input
@@ -71,7 +80,10 @@ const handleSubmit = () => {
             </div>
 
             <div>
-              <label for="password" class="block mb-2.5 text-sm font-medium text-gray-800 dark:text-white/90">
+              <label
+                for="password"
+                class="block mb-2.5 text-sm font-medium text-gray-800 dark:text-white/90"
+              >
                 Contraseña<span class="text-error-500">*</span>
               </label>
               <div class="relative">
@@ -91,7 +103,9 @@ const handleSubmit = () => {
                   @click="showPassword = !showPassword"
                 >
                   <AppIcon :name="showPassword ? 'eye-close' : 'eye'" class="h-5 w-5" />
-                  <span class="sr-only">{{ showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña' }}</span>
+                  <span class="sr-only">{{
+                    showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+                  }}</span>
                 </button>
               </div>
             </div>
@@ -101,7 +115,11 @@ const handleSubmit = () => {
               :disabled="login.isPending.value"
               class="flex w-full items-center justify-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              <AppIcon v-if="login.isPending.value" name="spinner" class="h-4 w-4 animate-spin text-white" />
+              <AppIcon
+                v-if="login.isPending.value"
+                name="spinner"
+                class="h-4 w-4 animate-spin text-white"
+              />
               {{ login.isPending.value ? 'Ingresando...' : 'Iniciar sesión' }}
             </button>
           </div>
