@@ -7,6 +7,7 @@ import RegisterNameModal from '@/components/common/RegisterNameModal.vue'
 
 import { ref } from 'vue'
 const title = ref<string>('Usos')
+const show = ref<boolean>(false)
 
 </script>
 <template>
@@ -21,15 +22,24 @@ const title = ref<string>('Usos')
           <template #actions>
             <button
               type="button"
-              class="inline-flex items-center gap-2 rounded-full border
-              border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700
-              hover:bg-gray-50 dark:border-gray-700
-              dark:text-gray-300 dark:hover:bg-white/5"
+              class="inline-flex items-center gap-2 rounded-full border border-gray-300 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5"
             >
               <AppIcon name="download" class="h-4 w-4" />
               Exportar
             </button>
-            <RegisterNameModal title="Uso" description="Uso para que el medicamento sea clasificado" />
+            <button
+              type="button"
+              class="inline-flex items-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600"
+              @click="show = true"
+            >
+              <AppIcon name="plus" class="h-3 w-3" />
+              Nuevo Uso
+            </button>
+            <RegisterNameModal
+              title="Uso"
+              description="Uso para que el medicamento sea clasificado"
+              v-model:show="show"
+            />
           </template>
         </PageHeader>
       </div>

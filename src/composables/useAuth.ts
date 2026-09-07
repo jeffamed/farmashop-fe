@@ -22,10 +22,10 @@ export const useAuth = () => {
 
   const handleLogin = async (credentials: LoginPayload) => {
     await authService.csrfCookie()
-    const { data } = await authService.login(credentials)
+    await authService.login(credentials)
     const user = await authService.me()
     authStore.setUser(user)
-    //return data
+    return user
   }
 
   const login = useMutation<User, AxiosError<ValidateErrorResponse>, LoginPayload>({

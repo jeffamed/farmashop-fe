@@ -19,8 +19,8 @@ export const useAuthStore = defineStore('auth', () =>  {
 
   const initialize = async () => {
     try {
-      const { data } = await authService.me()
-      setUser(data)
+      const user= await authService.me()
+      setUser(user)
     } catch (error) {
       clearUser()
       console.error(error)

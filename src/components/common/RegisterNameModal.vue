@@ -5,40 +5,34 @@ import AppIcon from '@/components/icons/AppIcon.vue'
 import { ref } from 'vue'
 
 interface Props {
-  title: string,
+  title: string
   description?: string
+  show: boolean
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  show: false,
+})
 const emit = defineEmits<{
   save: [payload: Payload]
+  'update:show': [show: boolean]
 }>()
 
-const show = ref<boolean>(false)
 const name = ref<string>('')
 
 const sendForm = () => {
-  emit('save', {name: name.value})
+  emit('save', { name: name.value })
   resetForm()
 }
 
 const resetForm = () => {
   name.value = ''
-  show.value = false
+  emit('update:show', false)
 }
-
 </script>
 
 <template>
   <div>
-    <button
-      type="button"
-      class="inline-flex items-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600"
-      @click="show = true"
-    >
-      <AppIcon name="plus" class="h-3 w-3" />
-      Nueva {{ props.title.toLowerCase() }}
-    </button>
     <ModalGlobal
       :title="`Agregar ${props.title.toLowerCase()}`"
       :description="props?.description"
@@ -62,7 +56,7 @@ const resetForm = () => {
                 id="name"
                 v-model="name"
                 class="block w-full rounded-full border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-800"
-                :placeholder='`Nombre de ${props.title.toLowerCase()}`'
+                :placeholder="`Nombre de ${props.title.toLowerCase()}`"
               />
             </div>
           </div>

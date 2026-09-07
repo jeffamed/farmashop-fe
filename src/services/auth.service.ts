@@ -1,6 +1,6 @@
 import { farmashopApi } from '@/api/axios.ts'
-import type { LoginPayload, User } from '@/types/Auth.ts'
-import { ref } from 'vue'
+import type {LoginPayload, User } from '@/types/Auth.ts'
+import type { ApiResponse } from '@/types/Response.ts'
 
 export const authService = {
 
@@ -19,7 +19,7 @@ export const authService = {
   },
 
   async me(){
-    const { data }  = await farmashopApi.get<User>('/api/user')
-    return data
+    const { data } = await farmashopApi.get<ApiResponse<User>>('/api/user')
+    return data.data
   }
 }
