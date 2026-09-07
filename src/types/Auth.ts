@@ -12,7 +12,6 @@ export interface User {
   name: string,
   last_name: string,
   email: string
-  //TODO add role and permissions
-  //role: string
-  //permissions: Permission[]
+  role: string
+  permissions: Permission[]
 }

@@ -1,4 +1,3 @@
-// stores/auth.store.ts
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { User } from '@/types/Auth.ts'
@@ -20,7 +19,7 @@ export const useAuthStore = defineStore('auth', () =>  {
 
   const initialize = async () => {
     try {
-      const data: User = await authService.me()
+      const { data } = await authService.me()
       setUser(data)
     } catch (error) {
       clearUser()
@@ -30,12 +29,20 @@ export const useAuthStore = defineStore('auth', () =>  {
     }
   }
 
+  const permissions = computed(() => auth.value?.permissions || [])
+
+  const can = (permission: string) => {
+    return permissions.value.some((p) => p.name === permission)
+  }
+
   return {
     user: auth,
     initialized,
     isAuthenticated,
+    permissions,
     clearUser,
     setUser,
     initialize,
+    can
   }
 })

@@ -52,7 +52,7 @@
             <ul class="flex flex-col gap-4">
               <li v-for="(item, index) in menuGroup.items" :key="item.name">
                 <button
-                  v-if="item.subItems"
+                  v-if="item.subItems && item.can && useAuth().canAll(item.can)"
                   @click="toggleSubmenu(groupIndex, index)"
                   :class="[
                     'menu-item group w-full',
@@ -80,9 +80,7 @@
                     name="chevron-down"
                     :class="[
                       'ml-auto w-5 h-5 transition-transform duration-200',
-                      {
-                        'rotate-180 text-brand-500': isSubmenuOpen(groupIndex, index),
-                      },
+                      { 'rotate-180 text-brand-500': isSubmenuOpen(groupIndex, index) },
                     ]"
                   />
                 </button>
@@ -122,6 +120,7 @@
                     <ul class="mt-2 space-y-1 ml-9">
                       <li v-for="subItem in item.subItems" :key="subItem.name">
                         <router-link
+                          v-if="useUser.can(subItem.can)"
                           :to="{ name: subItem.pathname }"
                           :class="[
                             'menu-dropdown-item',
@@ -147,33 +146,15 @@
 </template>
 <script setup lang="ts">
 import '@n8n/chat/style.css'
-import { createChat } from '@n8n/chat'
+//import { createChat } from '@n8n/chat'
 import { useSidebar } from '@/composables/useSidebar'
-import { computed, onMounted } from 'vue'
+import { computed } from 'vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
-import type { IconName } from '@/components/icons/type'
 import { useRoute } from 'vue-router'
+import type { MenuGroup } from '@/types/Sidebar'
+import { useAuth } from '@/composables/useAuth.ts'
 
-interface MenuSubItem {
-  name: string
-  path: string
-  pathname: string
-}
-
-interface MenuItem {
-  icon: IconName
-  name: string
-  path?: string
-  pathname?: string
-  subItems?: MenuSubItem[]
-}
-
-interface MenuGroup {
-  title: string
-  items: MenuItem[]
-}
-
-onMounted(() => {
+/*onMounted(() => {
   createChat({
     webhookUrl: 'http://localhost:5678/webhook/5d4bde84-176d-4133-9c03-64e1eacdd568/chat',
     defaultLanguage: 'es',
@@ -188,8 +169,10 @@ onMounted(() => {
       },
     },
   })
-})
+})*/
+
 const route = useRoute()
+const useUser = useAuth()
 const { isExpanded, isMobileOpen, isHovered, openSubmenu } = useSidebar()
 const menuGroups: MenuGroup[] = [
   {
@@ -209,89 +192,106 @@ const menuGroups: MenuGroup[] = [
       {
         icon: 'box-cube',
         name: 'Almacen',
+        can: ['product', 'location', 'type-product', 'presentation', 'usage', 'laboratory'],
         subItems: [
           {
             name: 'Productos',
             path: '/products',
             pathname: 'products',
+            can: 'product',
           },
           {
             name: 'Ubicaciones',
             path: '/locations',
             pathname: 'locations',
+            can: 'location',
           },
           {
             name: 'Tipos',
             path: '/type-products',
             pathname: 'type-products',
+            can: 'type-product',
           },
           {
             name: 'Presentaciones',
             path: '/presentations',
             pathname: 'presentations',
+            can: 'presentation',
           },
           {
             name: 'Usos',
             path: '/usages',
             pathname: 'usages',
+            can: 'usage',
           },
           {
             name: 'Laboratorios',
             path: '/laboratories',
             pathname: 'laboratories',
+            can: 'laboratory',
           },
         ],
       },
       {
         icon: 'folder',
         name: 'Compras',
+        can: ['order', 'supplier', 'reimbursement'],
         subItems: [
           {
             name: 'Ordenes de compra',
             path: '/orders',
             pathname: 'orders',
+            can: 'order',
           },
           {
             name: 'Proveedores',
             path: '/suppliers',
             pathname: 'suppliers',
+            can: 'supplier',
           },
           {
             name: 'Devoluciones',
             path: '/reimbursements',
             pathname: 'reimbursements',
+            can: 'reimbursement',
           },
         ],
       },
       {
         icon: 'table',
         name: 'Ventas',
+        can: ['sale', 'customer'],
         subItems: [
           {
             name: 'Registro de ventas',
             path: '/sales',
             pathname: 'sales',
+            can: 'sale',
           },
           {
             name: 'Clientes',
             path: '/customers',
             pathname: 'customers',
+            can: 'customer',
           },
         ],
       },
       {
         icon: 'user-group',
         name: 'Acceso',
+        can: ['user', 'role'],
         subItems: [
           {
             name: 'Usuarios',
             path: '/users',
             pathname: 'users',
+            can: 'user',
           },
           {
             name: 'Roles',
             path: '/roles',
             pathname: 'roles',
+            can: 'role',
           },
         ],
       },

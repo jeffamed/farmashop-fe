@@ -53,11 +53,19 @@ export const useAuth = () => {
     },
   })
 
+  const can = (permission: string) => authStore.can(permission)
+
+  const canAll = (permissions: string[]) => {
+    return permissions.some((permission) => can(permission))
+  }
+
   return {
     user: userQuery.data,
     login,
     logout,
     isAuthenticated: computed(() => !!userQuery.data.value),
     full_name: computed(() =>  authStore.user?.name + ' ' + authStore.user?.last_name),
+    can,
+    canAll
   }
 }
