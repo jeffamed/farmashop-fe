@@ -2,33 +2,45 @@
 import type { Payload } from '@/services/basicApiService'
 import ModalGlobal from '@/components/common/ModalGlobal.vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 interface Props {
   title: string
   description?: string
-  show: boolean
+  show: boolean,
+  loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   show: false,
+  loading: false
 })
 const emit = defineEmits<{
   save: [payload: Payload]
-  'update:show': [show: boolean]
 }>()
 
 const name = ref<string>('')
 
+watch( () => props.show, () => {
+  if (!props.show) {
+    resetForm()
+  }
+})
+
 const sendForm = () => {
-  emit('save', { name: name.value })
-  resetForm()
+  if (validateForm()) {
+    emit('save', { name: name.value })
+  }
 }
 
 const resetForm = () => {
   name.value = ''
-  emit('update:show', false)
 }
+
+const validateForm = () => {
+  return name.value.length > 0
+}
+
 </script>
 
 <template>
@@ -39,6 +51,7 @@ const resetForm = () => {
       :show="show"
       :onClose="resetForm"
       :onConfirm="sendForm"
+      :disableBtnConfirm="loading || !validateForm()"
     >
       <template #body>
         <form>

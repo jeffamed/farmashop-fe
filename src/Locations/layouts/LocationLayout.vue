@@ -4,11 +4,17 @@ import PageHeader from '@/components/layout/PageHeader.vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import RegisterNameModal from '@/components/common/RegisterNameModal.vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 const title = ref<string>('Ubicaciones')
 const show = ref<boolean>(false)
 import { useLocation } from '../composables/useLocation'
-const { createLocation } = useLocation()
+const { createLocation, locations } = useLocation()
+
+watch(createLocation.isSuccess, (value) => {
+  if (value) {
+    show.value = false
+  }
+})
 </script>
 <template>
   <admin-layout>
@@ -18,7 +24,7 @@ const { createLocation } = useLocation()
           :parent-path="{ name: 'Almacen', root: '/locations' }"
           :current-path="{ name: title, root: '/locations' }"
         />
-        <PageHeader group="Almacén" :title="title" :count="0">
+        <PageHeader group="Almacén" :title="title" :count="locations.length">
           <template #actions>
             <button
               type="button"
@@ -40,6 +46,7 @@ const { createLocation } = useLocation()
               description="Estantes en el local"
               @save="createLocation.mutate"
               v-model:show="show"
+              :loading="createLocation?.isPending.value ?? false"
             />
           </template>
         </PageHeader>

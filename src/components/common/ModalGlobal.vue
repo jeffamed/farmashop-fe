@@ -13,6 +13,8 @@ interface Props {
   cancelText?: string
   modalId?: string
   size?: Size
+  disableBtnConfirm?: boolean
+  loading?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -21,6 +23,8 @@ const props = withDefaults(defineProps<Props>(), {
   cancelText: 'Cancelar',
   modalId: 'default-modal',
   size: 'medium',
+  disableBtnConfirm: true,
+  loading: false
 })
 
 const sizeClass = computed(
@@ -56,7 +60,10 @@ const sizeClass = computed(
             >
               {{ props.title }}
             </h3>
-            <p v-if="props.description !== null" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            <p
+              v-if="props.description !== null"
+              class="mt-1 text-sm text-gray-500 dark:text-gray-400"
+            >
               {{ props.description }}
             </p>
           </div>
@@ -86,10 +93,12 @@ const sizeClass = computed(
           </button>
           <button
             type="button"
-            class="rounded-full bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600"
+            class="flex items-center justify-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
             @click="props.onConfirm"
+            :disabled="props.disableBtnConfirm || props.loading"
           >
-            {{ props.confirmText }}
+            <AppIcon v-if="props.loading" name="spinner" class="h-4 w-4 animate-spin text-white" />
+            {{ props.loading ? 'Cargando...' : props.confirmText }}
           </button>
         </div>
       </div>

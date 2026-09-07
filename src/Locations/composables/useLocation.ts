@@ -1,9 +1,14 @@
 import { basicApiService, type Payload } from '@/services/basicApiService.ts'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useLocationStore } from '@/Locations/stores/location.store.ts'
+import { watch } from 'vue'
+import { storeToRefs } from 'pinia'
 
 export const useLocation = () => {
 
-  //const queryClient = useQueryClient()
+  const locationStore = useLocationStore()
+  const { locations } = storeToRefs(locationStore)
+  const queryClient = useQueryClient()
 
   const locationService = basicApiService('locations')
 
@@ -12,18 +17,24 @@ export const useLocation = () => {
     queryFn: locationService.getList,
   })
 
+  watch(data, (locations) => {
+    if (locations) {
+      locationStore.setLocations(locations)
+    }
+  })
+
   const createLocation = useMutation({
     mutationFn: locationService.saveData,
-    /*onSuccess: () => {
+    onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['location'],
       })
-    },*/
+    },
   })
 
   return {
     isPending,
-    data,
+    locations,
     error,
     isError,
     createLocation
