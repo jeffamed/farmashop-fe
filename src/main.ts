@@ -12,7 +12,17 @@ import 'notivue/notification.css'
 import 'notivue/animations.css'
 
 const app = createApp(App)
-const notivue = createNotivue();
+const notivue = createNotivue({
+  position: 'top-right',
+  limit: 4,
+  enqueue: true,
+  avoidDuplicates: true,
+  notifications: {
+    global: {
+      duration: 3000,
+    },
+  },
+});
 
 app.use(notivue);
 app.use(createPinia())

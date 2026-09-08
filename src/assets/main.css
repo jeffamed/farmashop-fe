@@ -171,6 +171,12 @@ layer(base);
   color utility to any element that depends on these defaults.
 */
 
+:root {
+  /* Notivue's fixed container defaults to z-index: 500, which sits below the
+     app header/sidebar (z-99999). Raise it so toasts are never hidden. */
+  --nv-z: 999999;
+}
+
 @layer base {
   *,
   ::after,

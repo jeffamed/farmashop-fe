@@ -9,7 +9,7 @@ interface Props {
   description?: string
   show: boolean
   loading?: boolean,
-  needEdit: boolean,
+  needEdit?: boolean,
   value?: string
 }
 
@@ -65,7 +65,7 @@ const closeModal = () => {
       :disableBtnConfirm="loading || !validateForm()"
     >
       <template #body>
-        <form>
+        <div>
           <div class="grid gap-4 grid-cols-2">
             <div class="col-span-2">
               <label
@@ -84,7 +84,7 @@ const closeModal = () => {
               />
             </div>
           </div>
-        </form>
+        </div>
       </template>
     </ModalGlobal>
   </div>

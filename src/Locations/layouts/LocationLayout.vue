@@ -4,7 +4,9 @@ import PageHeader from '@/components/layout/PageHeader.vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import RegisterNameModal from '@/components/common/RegisterNameModal.vue'
+import { push } from 'notivue'
 import { ref, watch } from 'vue'
+
 const title = ref<string>('Ubicaciones')
 const show = ref<boolean>(false)
 import { useLocation } from '../composables/useLocation'
@@ -15,6 +17,17 @@ watch(createLocation.isSuccess, (value) => {
   if (value) {
     show.value = false
   }
+  push.success({
+    title: 'Creado Exitosamente',
+    message: 'La ubicación ha sido creada correctamente',
+  })
+})
+
+watch(deleteLocation.isSuccess, () => {
+  push.success({
+    title: 'Ubicación eliminada',
+    message: 'La ubicación ha sido eliminada correctamente',
+  })
 })
 </script>
 <template>
