@@ -32,11 +32,21 @@ export const useLocation = () => {
     },
   })
 
+  const deleteLocation = useMutation({
+    mutationFn: locationService.deleteData,
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['location'],
+      })
+    },
+  })
+
   return {
     isPending,
     locations,
     error,
     isError,
-    createLocation
+    createLocation,
+    deleteLocation
   }
 }

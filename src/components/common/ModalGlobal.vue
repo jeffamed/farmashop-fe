@@ -10,6 +10,8 @@ interface Props {
   onClose: () => void
   onConfirm: () => void
   confirmText?: string
+  colorConfirm?: string
+  colorHoverConfirm?: string
   cancelText?: string
   modalId?: string
   size?: Size
@@ -24,7 +26,9 @@ const props = withDefaults(defineProps<Props>(), {
   modalId: 'default-modal',
   size: 'medium',
   disableBtnConfirm: true,
-  loading: false
+  loading: false,
+  colorConfirm: 'brand-500',
+  colorHoverConfirm: 'brand-600'
 })
 
 const sizeClass = computed(
@@ -93,7 +97,8 @@ const sizeClass = computed(
           </button>
           <button
             type="button"
-            class="flex items-center justify-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-60"
+            class="flex items-center justify-center gap-2 rounded-full  px-5 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
+            :class="`bg-${props.colorConfirm} hover:bg-${props.colorHoverConfirm}`"
             @click="props.onConfirm"
             :disabled="props.disableBtnConfirm || props.loading"
           >

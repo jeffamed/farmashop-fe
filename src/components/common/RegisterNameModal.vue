@@ -7,25 +7,32 @@ import { ref, watch } from 'vue'
 interface Props {
   title: string
   description?: string
-  show: boolean,
-  loading?: boolean
+  show: boolean
+  loading?: boolean,
+  needEdit: boolean,
+  value?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
   show: false,
-  loading: false
+  loading: false,
+  needEdit: false
 })
 const emit = defineEmits<{
   save: [payload: Payload]
+  'update:show': [show: boolean]
 }>()
 
 const name = ref<string>('')
 
-watch( () => props.show, () => {
-  if (!props.show) {
-    resetForm()
-  }
-})
+watch(
+  () => props.show,
+  () => {
+    if (!props.show) {
+      resetForm()
+    }
+  },
+)
 
 const sendForm = () => {
   if (validateForm()) {
@@ -41,6 +48,10 @@ const validateForm = () => {
   return name.value.length > 0
 }
 
+const closeModal = () => {
+  emit('update:show', false)
+  resetForm()
+}
 </script>
 
 <template>
@@ -49,7 +60,7 @@ const validateForm = () => {
       :title="`Agregar ${props.title.toLowerCase()}`"
       :description="props?.description"
       :show="show"
-      :onClose="resetForm"
+      :onClose="closeModal"
       :onConfirm="sendForm"
       :disableBtnConfirm="loading || !validateForm()"
     >

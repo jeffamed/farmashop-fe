@@ -8,7 +8,8 @@ import { ref, watch } from 'vue'
 const title = ref<string>('Ubicaciones')
 const show = ref<boolean>(false)
 import { useLocation } from '../composables/useLocation'
-const { createLocation, locations } = useLocation()
+import SimpleCard from '@/components/common/SimpleCard.vue'
+const { createLocation, locations, deleteLocation } = useLocation()
 
 watch(createLocation.isSuccess, (value) => {
   if (value) {
@@ -50,6 +51,22 @@ watch(createLocation.isSuccess, (value) => {
             />
           </template>
         </PageHeader>
+      </div>
+      <div class="col-span-12">
+        <div class="relative flex-1">
+          <AppIcon
+            name="search"
+            class="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400 dark:text-gray-500"
+          />
+          <input
+            type="text"
+            placeholder="Buscar ubicación..."
+            class="h-11 w-full rounded-full border border-gray-300 bg-transparent pl-11 pr-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-800"
+          />
+        </div>
+      </div>
+      <div v-for="location in locations" class="col-span-3" :key="location.id">
+        <SimpleCard :title="location.name" :id="location.id" @onDelete="deleteLocation.mutate" />
       </div>
     </div>
   </admin-layout>

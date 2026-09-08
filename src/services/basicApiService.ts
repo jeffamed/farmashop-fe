@@ -12,7 +12,6 @@ export const basicApiService = (endpoint: Endpoint) => {
     return {
       getList: async () => {
         const { data } = await farmashopApi.get<ApiResponse<StandardData[]>>(`/api/v1/${endpoint}`)
-        console.info(data.data)
         return data.data
       },
       getOne: async (id: string|number) => {
@@ -24,8 +23,9 @@ export const basicApiService = (endpoint: Endpoint) => {
         return data
       },
       deleteData: async (id: string|number) => {
+        console.info(`Deleting ${endpoint} with id: ${id}`)
         const { data } = await farmashopApi.delete(`/api/v1/${endpoint}/${id}`)
-        return data
+        //return data
       },
       updateData: async (id: string|number, payload: Payload) => {
         const { data } = await farmashopApi.put(`/api/v1/${endpoint}/${id}`, payload)
