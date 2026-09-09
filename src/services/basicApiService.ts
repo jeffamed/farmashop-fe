@@ -10,8 +10,8 @@ export interface Payload {
 
 export const basicApiService = (endpoint: Endpoint) => {
     return {
-      getList: async () => {
-        const { data } = await farmashopApi.get<ApiResponse<StandardData[]>>(`/api/v1/${endpoint}`)
+      getList: async (search?: string) => {
+        const { data } = await farmashopApi.get<ApiResponse<StandardData[]>>(`/api/v1/${endpoint}`, { params: { search } })
         return data.data
       },
       getOne: async (id: string|number) => {

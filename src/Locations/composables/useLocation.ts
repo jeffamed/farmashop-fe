@@ -3,18 +3,20 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { useLocationStore } from '@/Locations/stores/location.store.ts'
 import { watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useDebouncedRef } from '@/utils/composables/useDebounceRef'
 
 export const useLocation = () => {
 
   const locationStore = useLocationStore()
-  const { locations } = storeToRefs(locationStore)
+  const { locations, search } = storeToRefs(locationStore)
   const queryClient = useQueryClient()
+  const debouncedSearch = useDebouncedRef(search)
 
   const locationService = basicApiService('locations')
 
   const { isPending, data, error, isError } = useQuery({
-    queryKey: ['location'],
-    queryFn: locationService.getList,
+    queryKey: ['locations', debouncedSearch],
+    queryFn: () => locationService.getList(debouncedSearch.value),
   })
 
   watch(data, (locations) => {
@@ -47,6 +49,7 @@ export const useLocation = () => {
     error,
     isError,
     createLocation,
-    deleteLocation
+    deleteLocation,
+    search
   }
 }

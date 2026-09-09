@@ -177,6 +177,12 @@ layer(base);
   --nv-z: 999999;
 }
 
+/* TanStack Query Devtools panel defaults to z-index: 9999, which sits below the
+   app header/sidebar (z-99999). Raise it so the panel isn't hidden behind them. */
+.tsqd-main-panel {
+  z-index: 100000 !important;
+}
+
 @layer base {
   *,
   ::after,

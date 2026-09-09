@@ -4,14 +4,15 @@ import PageHeader from '@/components/layout/PageHeader.vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
 import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
 import RegisterNameModal from '@/components/common/RegisterNameModal.vue'
+import { useLocation } from '../composables/useLocation'
+import SimpleCard from '@/components/common/SimpleCard.vue'
 import { push } from 'notivue'
 import { ref, watch } from 'vue'
 
 const title = ref<string>('Ubicaciones')
 const show = ref<boolean>(false)
-import { useLocation } from '../composables/useLocation'
-import SimpleCard from '@/components/common/SimpleCard.vue'
-const { createLocation, locations, deleteLocation } = useLocation()
+
+const { createLocation, locations, deleteLocation, search } = useLocation()
 
 watch(createLocation.isSuccess, (value) => {
   if (value) {
@@ -29,6 +30,7 @@ watch(deleteLocation.isSuccess, () => {
     message: 'La ubicación ha sido eliminada correctamente',
   })
 })
+
 </script>
 <template>
   <admin-layout>
@@ -74,6 +76,7 @@ watch(deleteLocation.isSuccess, () => {
           <input
             type="text"
             placeholder="Buscar ubicación..."
+            v-model="search"
             class="h-11 w-full rounded-full border border-gray-300 bg-transparent pl-11 pr-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-800"
           />
         </div>

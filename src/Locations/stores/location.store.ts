@@ -5,6 +5,7 @@ import type { StandardData } from '@/types/StandardData.ts'
 export const useLocationStore = defineStore('location', () => {
 
   const locations = ref<StandardData[]>([])
+  const search = ref<string>('')
 
   const setLocations = (data: StandardData[]) => {
     locations.value = data
@@ -12,6 +13,7 @@ export const useLocationStore = defineStore('location', () => {
 
   return {
     locations,
-    setLocations
+    setLocations,
+    search,
   }
 })
