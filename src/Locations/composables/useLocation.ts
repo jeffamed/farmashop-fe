@@ -6,12 +6,15 @@ import { storeToRefs } from 'pinia'
 import { useDebouncedRef } from '@/utils/composables/useDebounceRef'
 
 export const useLocation = () => {
+  type UpdateLocationVariables = {
+    id: number
+    payload: Payload
+  }
 
   const locationStore = useLocationStore()
   const { locations, search } = storeToRefs(locationStore)
   const queryClient = useQueryClient()
   const debouncedSearch = useDebouncedRef(search)
-
   const locationService = basicApiService('locations')
 
   const { isPending, data, error, isError } = useQuery({
@@ -29,7 +32,7 @@ export const useLocation = () => {
     mutationFn: locationService.saveData,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['location'],
+        queryKey: ['locations'],
       })
     },
   })
@@ -38,7 +41,16 @@ export const useLocation = () => {
     mutationFn: locationService.deleteData,
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ['location'],
+        queryKey: ['locations'],
+      })
+    },
+  })
+
+  const editLocation = useMutation({
+    mutationFn: ({id, payload}: UpdateLocationVariables) => locationService.updateData(id, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ['locations'],
       })
     },
   })
@@ -50,6 +62,7 @@ export const useLocation = () => {
     isError,
     createLocation,
     deleteLocation,
+    editLocation,
     search
   }
 }

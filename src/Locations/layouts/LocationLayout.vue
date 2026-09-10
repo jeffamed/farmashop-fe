@@ -7,30 +7,68 @@ import RegisterNameModal from '@/components/common/RegisterNameModal.vue'
 import { useLocation } from '../composables/useLocation'
 import SimpleCard from '@/components/common/SimpleCard.vue'
 import { push } from 'notivue'
-import { ref, watch } from 'vue'
+import { computed, ref } from 'vue'
+import type { Payload } from '@/services/basicApiService.ts'
 
-const title = ref<string>('Ubicaciones')
-const show = ref<boolean>(false)
+const title = ref('Ubicaciones')
+const show = ref(false)
+const location_id = ref(0)
+const location_name = ref('')
 
-const { createLocation, locations, deleteLocation, search } = useLocation()
+const { createLocation, locations, deleteLocation, search, editLocation } = useLocation()
+const newLocation = () => {
+  location_id.value = 0
+  location_name.value = ''
+  show.value = true
+}
 
-watch(createLocation.isSuccess, (value) => {
-  if (value) {
-    show.value = false
+const editLocationAction = (location: { id: number; name: string }) => {
+  location_id.value = location.id
+  location_name.value = location.name
+  show.value = true
+}
+
+const isSaving = computed(() => editLocation.isPending.value || createLocation.isPending.value)
+
+const actionLocation = (form: Payload) => {
+  if (location_id.value > 0) {
+    editLocation.mutate(
+      { id: location_id.value, payload: form },
+      {
+        onSuccess: () => {
+          show.value = false
+          location_id.value = 0
+          location_name.value = ''
+          push.success({
+            title: 'Acción Exitosa..',
+            message: 'La ubicación ha sido editada correctamente',
+          })
+        },
+      },
+    )
+  } else {
+    createLocation.mutate(form, {
+      onSuccess: () => {
+        show.value = false
+        push.success({
+          title: 'Creado Exitosamente',
+          message: 'La ubicación ha sido creada correctamente',
+        })
+      },
+    })
   }
-  push.success({
-    title: 'Creado Exitosamente',
-    message: 'La ubicación ha sido creada correctamente',
-  })
-})
+}
 
-watch(deleteLocation.isSuccess, () => {
-  push.success({
-    title: 'Ubicación eliminada',
-    message: 'La ubicación ha sido eliminada correctamente',
+const removeLocation = (location_id: number|string) => {
+  deleteLocation.mutate(location_id, {
+    onSuccess: () => {
+      push.success({
+        title: 'Ubicación eliminada',
+        message: 'La ubicación ha sido eliminada correctamente',
+      })
+    },
   })
-})
-
+}
 </script>
 <template>
   <admin-layout>
@@ -52,17 +90,30 @@ watch(deleteLocation.isSuccess, () => {
             <button
               type="button"
               class="inline-flex items-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-600"
-              @click="show = true"
+              @click="newLocation"
             >
               <AppIcon name="plus" class="h-3 w-3" />
               Nueva Ubicación
             </button>
+            <Teleport to="body">
+              <RegisterNameModal
+                title="Ubicación"
+                description="Estantes en el local"
+                @save="actionLocation"
+                v-model:show="show"
+                :loading="isSaving"
+                :needEdit="location_id > 0"
+                :value="location_name"
+              />
+            </Teleport>
             <RegisterNameModal
               title="Ubicación"
               description="Estantes en el local"
-              @save="createLocation.mutate"
+              @save="actionLocation"
               v-model:show="show"
-              :loading="createLocation?.isPending.value ?? false"
+              :loading="isSaving"
+              :needEdit="location_id > 0"
+              :value="location_name"
             />
           </template>
         </PageHeader>
@@ -82,7 +133,12 @@ watch(deleteLocation.isSuccess, () => {
         </div>
       </div>
       <div v-for="location in locations" class="col-span-3" :key="location.id">
-        <SimpleCard :title="location.name" :id="location.id" @onDelete="deleteLocation.mutate" />
+        <SimpleCard
+          :title="location.name"
+          :id="location.id"
+          @onDelete="removeLocation"
+          :onEdit="() => editLocationAction(location)"
+        />
       </div>
     </div>
   </admin-layout>
