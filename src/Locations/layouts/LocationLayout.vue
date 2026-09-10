@@ -106,15 +106,6 @@ const removeLocation = (location_id: number|string) => {
                 :value="location_name"
               />
             </Teleport>
-            <RegisterNameModal
-              title="Ubicación"
-              description="Estantes en el local"
-              @save="actionLocation"
-              v-model:show="show"
-              :loading="isSaving"
-              :needEdit="location_id > 0"
-              :value="location_name"
-            />
           </template>
         </PageHeader>
       </div>
