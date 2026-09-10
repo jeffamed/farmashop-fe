@@ -1,6 +1,6 @@
 import { basicApiService, type Payload } from '@/services/basicApiService.ts'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { useUsageStore } from '@/Usages/stores/usage.store.ts'
+import { type Usage, useUsageStore } from '@/Usages/stores/usage.store.ts'
 import { watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useDebouncedRef } from '@/utils/composables/useDebounceRef'
@@ -15,7 +15,7 @@ export const useUsage = () => {
   const { usages, search } = storeToRefs(usageStore)
   const queryClient = useQueryClient()
   const debouncedSearch = useDebouncedRef(search)
-  const usageService = basicApiService('usages')
+  const usageService = basicApiService<Usage>('usages')
 
   const { isPending, data, error, isError } = useQuery({
     queryKey: ['usages', debouncedSearch],
@@ -28,8 +28,14 @@ export const useUsage = () => {
     }
   })
 
+  const transformPayload = (payload: Payload) => {
+    return {
+      description: payload.name,
+    }
+  }
+
   const createUsage = useMutation({
-    mutationFn: usageService.saveData,
+    mutationFn: (payload: Payload) => usageService.saveData(transformPayload(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['usages'],
@@ -47,7 +53,7 @@ export const useUsage = () => {
   })
 
   const editUsage = useMutation({
-    mutationFn: ({id, payload}: UpdateUsageVariables) => usageService.updateData(id, payload),
+    mutationFn: ({id, payload}: UpdateUsageVariables) => usageService.updateData(id, transformPayload(payload)),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ['usages'],

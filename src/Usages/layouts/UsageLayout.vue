@@ -22,9 +22,9 @@ const newUsage = () => {
   show.value = true
 }
 
-const editUsageAction = (usage: { id: number; name: string }) => {
+const editUsageAction = (usage: { id: number; description: string }) => {
   usage_id.value = usage.id
-  usage_name.value = usage.name
+  usage_name.value = usage.description
   show.value = true
 }
 
@@ -123,7 +123,7 @@ const removeUsage = (usage_id: number|string) => {
       </div>
       <div v-for="usage in usages" class="col-span-3" :key="usage.id">
         <SimpleCard
-          :title="usage.name"
+          :title="usage.description"
           :id="usage.id"
           @onDelete="removeUsage"
           :onEdit="() => editUsageAction(usage)"
