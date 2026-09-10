@@ -60,7 +60,6 @@ const closeModal = () => {
 
 <template>
   <div>
-    <Teleport to="body">
       <ModalGlobal
         :title="`${props.needEdit ? 'Editar' : 'Agregar'} ${props.title.toLowerCase()}`"
         :description="props?.description"
@@ -92,7 +91,6 @@ const closeModal = () => {
           </div>
         </template>
       </ModalGlobal>
-    </Teleport>
   </div>
 </template>
 

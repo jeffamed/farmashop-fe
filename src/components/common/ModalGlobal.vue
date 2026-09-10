@@ -97,6 +97,7 @@ const sizeClass = computed(
           </button>
           <button
             type="button"
+            id="confirm-button"
             class="flex items-center justify-center gap-2 rounded-full  px-5 py-2.5 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-60"
             :class="`bg-${props.colorConfirm} hover:bg-${props.colorHoverConfirm}`"
             @click="props.onConfirm"
