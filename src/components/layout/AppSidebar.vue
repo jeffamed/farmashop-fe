@@ -210,7 +210,7 @@ const menuGroups: MenuGroup[] = [
             name: 'Tipos',
             path: '/type-products',
             pathname: 'type-products',
-            can: 'type-product',
+            can: 'type',
           },
           {
             name: 'Presentaciones',

@@ -15,7 +15,7 @@ export const useTypeProduct = () => {
   const { typeProducts, search } = storeToRefs(typeProductStore)
   const queryClient = useQueryClient()
   const debouncedSearch = useDebouncedRef(search)
-  const typeProductService = basicApiService('type-products')
+  const typeProductService = basicApiService('types')
 
   const { isPending, data, error, isError } = useQuery({
     queryKey: ['type-products', debouncedSearch],
