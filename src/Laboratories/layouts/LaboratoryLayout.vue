@@ -14,10 +14,10 @@ const show = ref<boolean>(false)
 const id = ref<number>(0)
 const name = ref<string>('')
 const address = ref<string>('')
-const optionsSearching = Object.values(filterTable)
+const optionsSearching = Object.entries(filterTable).map(([value, label]) => ({ value, label }))
 const columns = ref<string[]>(['Nombre', 'Direccion'])
 
-const { laboratories, laboratoriesData } = useLaboratory()
+const { laboratories, total, filter, pagination } = useLaboratory()
 
 const newLaboratory = () => {
   id.value = 0
@@ -38,7 +38,7 @@ const saveLaboratory = (payload: Record<string, string>) => {
           :parent-path="{ name: 'Almacén', root: '/laboratories' }"
           :current-path="{ name: title, root: '/laboratories' }"
         />
-        <PageHeader group="Almacén" :title="title" :count="laboratories.length">
+        <PageHeader group="Almacén" :title="title" :count="total">
           <template #actions>
             <button
               type="button"
@@ -59,8 +59,8 @@ const saveLaboratory = (payload: Record<string, string>) => {
           </template>
         </PageHeader>
       </div>
-      <div class="col-span-12" v-show="laboratoriesData.isSuccess.value">
-        <TableComponent :fieldOptions="optionsSearching" :columns="columns" :data="laboratories">
+      <div class="col-span-12">
+        <TableComponent :fieldOptions="optionsSearching" :columns="columns" v-model:filterSearch="filter" v-model:pagination="pagination">
           <template #default>
             <tr
               class="hover:bg-gray-50 dark:hover:bg-white/[0.03]"

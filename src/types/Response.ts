@@ -2,6 +2,11 @@ export interface ApiResponse<T> {
   data: T
 }
 
+export interface PaginatedApiResponse<T> {
+  data: T
+  meta: Meta
+}
+
 export interface Links {
   first: string
   last: string
@@ -13,7 +18,7 @@ export interface Meta {
   current_page: number
   from: number
   last_page: number
-  links: Link[]
+  links?: Link[]
   path: string
   per_page: number
   to: number

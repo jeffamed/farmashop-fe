@@ -11,5 +11,7 @@ export interface Laboratory{
 
 export interface filterLaboratory {
   input: string,
-  search: string
+  search: string,
+  page: number,
+  per_page?: number,
 }

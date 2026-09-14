@@ -7,10 +7,10 @@ export const useLaboratory = () => {
 
   const service = laboratoryService()
   const store = useLaboratoryStore()
-  const { laboratories } = storeToRefs(store)
+  const { laboratories, filter, total, pagination } = storeToRefs(store)
 
   const laboratoriesData = useQuery({
-    queryKey: ['laboratories'],
+    queryKey: ['laboratories', filter],
     queryFn: () => service.getLaboratories(store.filter)
   })
 
@@ -22,7 +22,8 @@ export const useLaboratory = () => {
 
   return{
     laboratoriesData,
-    laboratories
+    laboratories,
+    filter, total, pagination
   }
 
 }
