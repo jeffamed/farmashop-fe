@@ -1,39 +1,40 @@
 <script setup lang="ts">
 import ModalGlobal from '@/components/common/ModalGlobal.vue'
-import { ref } from 'vue'
-import type { LaboratoryForm } from '@/Laboratories/types/Laboratory.ts'
+import { ref, watch } from 'vue'
+import type { Laboratory } from '@/Laboratories/types/Laboratory.ts'
 import { useLaboratory } from '@/Laboratories/composables/useLaboratory.ts'
 import { push } from 'notivue'
 
 interface Props {
   show: boolean
-  loading?: boolean
+  laboratory: Laboratory
 }
+
 const props = withDefaults(defineProps<Props>(), {
   show: false,
-  loading: false,
 })
 
 const emit = defineEmits<{
   'update:show': [show: boolean]
 }>()
 
-const { createLaboratory } = useLaboratory()
-const titleModal = ref('Nuevo laboratorio')
-const form = ref<LaboratoryForm>({
-  name: '',
-  address: '',
+const { editLaboratory } = useLaboratory()
+const titleModal = ref('Editar laboratorio')
+const form = ref<Laboratory>({
+  id: props.laboratory.id,
+  name: props.laboratory.name,
+  address: props.laboratory.address,
 })
 
 const handleSubmit = () => {
   if (!validateForm()) return
-  createLaboratory.mutate(form.value,{
+  editLaboratory.mutate(form.value,{
     onSuccess: () => {
       handleCancel()
-      push.success('El laboratorio se creó correctamente')
+      push.success('El Laboratorio se edito correctamente')
     },
     onError: () => {
-      push.error('Ocurrio un error al crear el laboratorio')
+      push.error('Ocurrio un error al editar el laboratorio')
     }
   })
 }
@@ -44,6 +45,12 @@ const handleCancel = () => {
 const validateForm = () => {
   return form.value.name !== ''
 }
+
+watch(
+  () => props.laboratory,
+  (newVal) => (form.value = { ...newVal }),
+  { immediate: true },
+)
 </script>
 <template>
   <div>
@@ -52,7 +59,7 @@ const validateForm = () => {
       :show="props.show"
       :onClose="handleCancel"
       :onConfirm="handleSubmit"
-      :disableBtnConfirm="createLaboratory.isPending.value || !validateForm()"
+      :disableBtnConfirm="editLaboratory.isPending.value || !validateForm()"
     >
       <template #body>
         <div class="grid gap-4 md:grid-cols-2">

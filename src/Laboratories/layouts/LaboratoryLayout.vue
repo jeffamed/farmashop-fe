@@ -8,6 +8,7 @@ import FormModal from '@/Laboratories/components/FormModal.vue'
 import TableComponent from '@/components/common/TableComponent.vue'
 import { filterTable } from '@/Laboratories/Enums/LaboratoryEnum'
 import { useLaboratory } from '@/Laboratories/composables/useLaboratory.ts'
+import TableBody from '@/Laboratories/components/TableBody.vue'
 
 const title = ref<string>('Laboratorios')
 const show = ref<boolean>(false)
@@ -17,17 +18,13 @@ const address = ref<string>('')
 const optionsSearching = Object.entries(filterTable).map(([value, label]) => ({ value, label }))
 const columns = ref<string[]>(['Nombre', 'Direccion'])
 
-const { laboratories, total, filter, pagination } = useLaboratory()
+const { total, filter, pagination } = useLaboratory()
 
 const newLaboratory = () => {
   id.value = 0
   name.value = ''
   address.value = ''
   show.value = true
-}
-
-const saveLaboratory = (payload: Record<string, string>) => {
-  console.log('Payload', payload)
 }
 </script>
 <template>
@@ -55,45 +52,14 @@ const saveLaboratory = (payload: Record<string, string>) => {
               <AppIcon name="plus" class="h-3 w-3" />
               Nueva Laboratorio
             </button>
-            <FormModal v-model:show="show" @save="saveLaboratory" />
+            <FormModal v-model:show="show" />
           </template>
         </PageHeader>
       </div>
       <div class="col-span-12">
         <TableComponent :fieldOptions="optionsSearching" :columns="columns" v-model:filterSearch="filter" v-model:pagination="pagination">
           <template #default>
-            <tr
-              class="hover:bg-gray-50 dark:hover:bg-white/[0.03]"
-              v-for="laboratory in laboratories"
-              :key="laboratory.id"
-            >
-              <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-                <p class="font-medium text-gray-800 dark:text-white/90">{{ laboratory.name }}</p>
-              </td>
-              <td
-                class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-              >
-                <p class="font-medium text-gray-800 dark:text-white/90">{{ laboratory.address }}</p>
-              </td>
-              <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-                <div class="flex items-center justify-end gap-1">
-                  <button
-                    type="button"
-                    class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-                  >
-                    <AppIcon name="edit" class="h-4 w-4" />
-                    <span class="sr-only">Editar</span>
-                  </button>
-                  <button
-                    type="button"
-                    class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-                  >
-                    <AppIcon name="trash" class="h-4 w-4" />
-                    <span class="sr-only">Eliminar</span>
-                  </button>
-                </div>
-              </td>
-            </tr>
+            <table-body />
           </template>
         </TableComponent>
       </div>
