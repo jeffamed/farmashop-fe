@@ -1,11 +1,25 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref, watch } from 'vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
+import { useDebouncedRef } from '@/utils/composables/useDebounceRef'
 
-const fieldOptions = ['Nombre', 'Laboratorio', 'Categoría']
-const selectedField = ref(fieldOptions[0])
+interface Props {
+  columns: string[]
+  fieldOptions?: string[]
+}
+const props = withDefaults(defineProps<Props>(), {
+  fieldOptions: () => [],
+})
+
+const emit = defineEmits<{
+  filter: [field: string, search: string]
+}>()
+
+const selectedField = ref('')
+const search = ref('')
 const fieldDropdownOpen = ref(false)
 const fieldDropdownRef = ref<HTMLElement | null>(null)
+const debouncedSearch = useDebouncedRef(search)
 
 const toggleFieldDropdown = () => {
   fieldDropdownOpen.value = !fieldDropdownOpen.value
@@ -22,6 +36,25 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
+watch(
+  () => props.fieldOptions,
+  (options) => {
+    if (options.length > 0) {
+      selectedField.value = options[0] ?? ''
+    }
+  },
+  {
+    immediate: true,
+  },
+)
+
+watch([debouncedSearch, selectedField], ([search, field]) => {
+  if (search !== '') {
+    console.info('Emit filter:', field, search)
+    emit('filter', field, search)
+  }
+})
+
 onMounted(() => document.addEventListener('click', handleClickOutside))
 onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 </script>
@@ -34,7 +67,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
     <div
       class="flex flex-col gap-3 border-b border-gray-200 p-4 dark:border-gray-800 sm:flex-row sm:items-center sm:p-5"
     >
-      <div ref="fieldDropdownRef" class="relative">
+      <div v-if="props.fieldOptions.length > 0" ref="fieldDropdownRef" class="relative">
         <button
           type="button"
           class="flex h-11 w-full items-center justify-between gap-3 rounded-full border border-gray-300 bg-transparent px-4 text-sm font-medium text-gray-700 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-white/5 dark:text-gray-300 dark:focus:border-brand-800 sm:w-auto"
@@ -47,7 +80,6 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
             :class="{ 'rotate-180': fieldDropdownOpen }"
           />
         </button>
-
         <div
           v-if="fieldDropdownOpen"
           class="absolute left-0 z-10 mt-2 w-40 rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
@@ -76,12 +108,14 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
         />
         <input
           type="text"
+          v-model="search"
           placeholder="Texto a buscar..."
           class="h-11 w-full rounded-full border border-gray-300 bg-transparent pl-11 pr-4 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-800"
         />
       </div>
 
       <button
+        v-if="false"
         type="button"
         class="flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5"
       >
@@ -99,7 +133,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
     </div>
 
     <!-- Table -->
-    <div class="overflow-x-auto">
+    <!--<div class="overflow-x-auto">
       <table class="w-full text-left">
         <thead>
           <tr class="border-b border-gray-200 dark:border-gray-800">
@@ -141,10 +175,14 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
               <p class="font-medium text-gray-800 dark:text-white/90">Acetaminofén 500mg</p>
               <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1042</p>
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               Lab Génesis
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               Analgésicos
             </td>
             <td
@@ -198,10 +236,14 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
               <p class="font-medium text-gray-800 dark:text-white/90">Amoxicilina 250mg susp.</p>
               <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1043</p>
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               FarmaNova
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               Antibióticos
             </td>
             <td
@@ -255,10 +297,14 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
               <p class="font-medium text-gray-800 dark:text-white/90">Ibuprofeno 400mg</p>
               <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1044</p>
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               Lab Génesis
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               Analgésicos
             </td>
             <td
@@ -312,10 +358,14 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
               <p class="font-medium text-gray-800 dark:text-white/90">Loratadina 10mg</p>
               <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1045</p>
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               Vitalis
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               Antihistamínicos
             </td>
             <td
@@ -369,10 +419,14 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
               <p class="font-medium text-gray-800 dark:text-white/90">Omeprazol 20mg</p>
               <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1046</p>
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               FarmaNova
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               Gastro
             </td>
             <td
@@ -426,10 +480,14 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
               <p class="font-medium text-gray-800 dark:text-white/90">Suero oral 500ml</p>
               <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1047</p>
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               Hidralab
             </td>
-            <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+            <td
+              class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
+            >
               Hidratación
             </td>
             <td
@@ -478,6 +536,30 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
               </div>
             </td>
           </tr>
+        </tbody>
+      </table>
+    </div>-->
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left">
+        <thead>
+          <tr class="border-b border-gray-200 dark:border-gray-800" >
+            <th
+              class="whitespace-nowrap px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:px-6"
+              v-for="(column, idx) in columns"
+              :key="idx"
+            >
+              {{ column }}
+            </th>
+            <th
+              class="whitespace-nowrap px-5 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:px-6"
+            >
+              Opciones
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
+          <slot></slot>
         </tbody>
       </table>
     </div>
