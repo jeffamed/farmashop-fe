@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import type { CustomerForm } from '@/Customers/types/Customer.ts'
 import { useCustomer } from '@/Customers/composables/useCustomer.ts'
 import { push } from 'notivue'
+import type { PhoneMeta } from 'vue-tel-input'
 
 interface Props {
   show: boolean
@@ -22,7 +23,7 @@ const { createCustomer } = useCustomer()
 const titleModal = ref('Nuevo cliente')
 const form = ref<CustomerForm>({
   name: '',
-  cedula: '',
+  dni: '',
   address: '',
   email: '',
   phone: '',
@@ -30,14 +31,14 @@ const form = ref<CustomerForm>({
 
 const handleSubmit = () => {
   if (!validateForm()) return
-  createCustomer.mutate(form.value,{
+  createCustomer.mutate(form.value, {
     onSuccess: () => {
       handleCancel()
       push.success('El cliente se creó correctamente')
     },
     onError: () => {
       push.error('Ocurrio un error al crear el cliente')
-    }
+    },
   })
 }
 const handleCancel = () => {
@@ -46,6 +47,10 @@ const handleCancel = () => {
 
 const validateForm = () => {
   return form.value.name !== ''
+}
+
+const handlePhoneInput = (number: string, phoneObject: PhoneMeta) => {
+  form.value.phone = phoneObject
 }
 </script>
 <template>
@@ -83,7 +88,7 @@ const validateForm = () => {
             <input
               type="text"
               id="txtCedula"
-              v-model="form.cedula"
+              v-model="form.dni"
               class="block w-full rounded-full border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-800"
               placeholder="Cédula del cliente"
             />
@@ -92,7 +97,7 @@ const validateForm = () => {
             <label
               for="txtEmail"
               class="block mb-2.5 text-sm font-medium text-gray-800 dark:text-white/90"
-              >Correo</label
+              >Correo Electronico</label
             >
             <input
               type="email"
@@ -102,19 +107,20 @@ const validateForm = () => {
               placeholder="Correo del cliente"
             />
           </div>
-          <div>
+          <div class="col-span-2">
             <label
               for="txtPhone"
               class="block mb-2.5 text-sm font-medium text-gray-800 dark:text-white/90"
-              >Teléfono</label
             >
-            <input
-              type="text"
+              Teléfono
+            </label>
+            <vue-tel-input
               id="txtPhone"
-              v-model="form.phone"
               class="block w-full rounded-full border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-800"
-              placeholder="Teléfono del cliente"
-            />
+              :value="form.phone"
+              :inputOptions="{ placeholder: 'Teléfono del cliente' }"
+              @on-input="handlePhoneInput"
+            ></vue-tel-input>
           </div>
           <div class="col-span-2">
             <label

@@ -1,18 +1,23 @@
-export interface CustomerForm {
-  name: string,
-  dni: string,
-  address: string,
-  email: string,
-  phone: string
-}
+import type { PhoneMeta } from 'vue-tel-input'
 
-export interface Customer {
+export interface CustomerForm {
+  name: string
+  dni: string
+  address: string
+  email: string
+  phone: PhoneMeta | string
+}
+export interface CustomerData {
   id: number
   name: string
   dni: string
   address: string
   email: string
-  phone: string
+  phone: PhoneMeta | string
+}
+
+export interface Customer extends CustomerData {
+  phone_number: string
 }
 
 export interface filterCustomer {

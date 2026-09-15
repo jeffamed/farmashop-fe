@@ -4,13 +4,13 @@ import AppIcon from '@/components/icons/AppIcon.vue'
 import { useSupplier } from '@/Suppliers/composables/useSupplier.ts'
 import DeleteModal from '@/components/common/Modals/DeleteModal.vue'
 import EditFormModal from '@/Suppliers/components/EditFormModal.vue'
-import type { Supplier } from '@/Suppliers/types/Supplier.ts'
+import type { SupplierData } from '@/Suppliers/types/Supplier.ts'
 import { push } from 'notivue'
 
 const { suppliers, deleteSupplier } = useSupplier()
 const showDeleteModal = ref(false)
 const showEditModal = ref(false)
-const supplier = ref<Supplier>({
+const supplier = ref<SupplierData>({
   id: 0,
   name: '',
   ruc: '',
@@ -39,7 +39,7 @@ const handleDelete = (deleteRegister: boolean) => {
   showDeleteModal.value = false
 }
 
-const actionButtons = (sup: Supplier, action: string = 'delete') => {
+const actionButtons = (sup: SupplierData, action: string = 'delete') => {
   supplier.value = sup
   if (action === 'delete') {
     showDeleteModal.value = true
@@ -66,7 +66,7 @@ const actionButtons = (sup: Supplier, action: string = 'delete') => {
       <p class="font-medium text-gray-800 dark:text-white/90">{{ supplier.address }}</p>
     </td>
     <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
-      <p class="font-medium text-gray-800 dark:text-white/90">{{ supplier.phone }}</p>
+      <p class="font-medium text-gray-800 dark:text-white/90">{{ supplier.phone_number }}</p>
     </td>
     <td class="whitespace-nowrap px-5 py-4 sm:px-6">
       <div class="flex items-center justify-end gap-1">

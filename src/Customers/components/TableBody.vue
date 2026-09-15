@@ -4,13 +4,13 @@ import AppIcon from '@/components/icons/AppIcon.vue'
 import { useCustomer } from '@/Customers/composables/useCustomer.ts'
 import DeleteModal from '@/components/common/Modals/DeleteModal.vue'
 import EditFormModal from '@/Customers/components/EditFormModal.vue'
-import type { Customer } from '@/Customers/types/Customer.ts'
+import type { Customer, CustomerData } from '@/Customers/types/Customer.ts'
 import { push } from 'notivue'
 
 const { customers, deleteCustomer } = useCustomer()
 const showDeleteModal = ref(false)
 const showEditModal = ref(false)
-const customer = ref<Customer>({
+const customer = ref<CustomerData>({
   id: 0,
   name: '',
   dni: '',
@@ -41,7 +41,7 @@ const handleDelete = (deleteRegister: boolean) => {
   showDeleteModal.value = false
 }
 
-const actionButtons = (cust: Customer, action: string = 'delete') => {
+const actionButtons = (cust: CustomerData, action: string = 'delete') => {
   customer.value = cust
   if (action === 'delete') {
     showDeleteModal.value = true
@@ -71,7 +71,7 @@ const actionButtons = (cust: Customer, action: string = 'delete') => {
       <p class="font-medium text-gray-800 dark:text-white/90">{{ customer.email }}</p>
     </td>
     <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
-      <p class="font-medium text-gray-800 dark:text-white/90">{{ customer.phone }}</p>
+      <p class="font-medium text-gray-800 dark:text-white/90">{{ customer.phone_number }}</p>
     </td>
     <td class="whitespace-nowrap px-5 py-4 sm:px-6">
       <div class="flex items-center justify-end gap-1">
@@ -95,7 +95,7 @@ const actionButtons = (cust: Customer, action: string = 'delete') => {
     </td>
   </tr>
   <DeleteModal :show="showDeleteModal" :label="customer.name" @onConfirm="handleDelete" />
-  <EditFormModal v-model:show="showEditModal" :customer="customer"/>
+  <EditFormModal v-model:show="showEditModal" :customer="customer" />
 </template>
 
 <style scoped></style>

@@ -4,6 +4,7 @@ import { ref } from 'vue'
 import type { SupplierForm } from '@/Suppliers/types/Supplier.ts'
 import { useSupplier } from '@/Suppliers/composables/useSupplier.ts'
 import { push } from 'notivue'
+import type { PhoneMeta } from 'vue-tel-input'
 
 interface Props {
   show: boolean
@@ -26,6 +27,7 @@ const form = ref<SupplierForm>({
   address: '',
   phone: '',
 })
+const phoneInput = ref('')
 
 const handleSubmit = () => {
   if (!validateForm()) return
@@ -45,6 +47,10 @@ const handleCancel = () => {
 
 const validateForm = () => {
   return form.value.name !== ''
+}
+
+const handlePhoneInput = (number: string, phoneObject: PhoneMeta) => {
+  form.value.phone = phoneObject
 }
 </script>
 <template>
@@ -93,12 +99,12 @@ const validateForm = () => {
               class="block mb-2.5 text-sm font-medium text-gray-800 dark:text-white/90"
               >Teléfono</label
             >
-            <input
-              type="text"
+            <vue-tel-input
               id="txtPhone"
-              v-model="form.phone"
               class="block w-full rounded-full border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-800"
-              placeholder="Teléfono del proveedor"
+              v-model="phoneInput"
+              :inputOptions="{ placeholder: 'Teléfono del proveedor' }"
+              @on-input="handlePhoneInput"
             />
           </div>
           <div class="col-span-2">

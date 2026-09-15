@@ -3,6 +3,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import { createNotivue } from 'notivue'
+import VueTelInput from 'vue-tel-input'
 
 import App from './App.vue'
 import router from './router'
@@ -10,6 +11,7 @@ import { VueQueryPlugin } from '@tanstack/vue-query'
 
 import 'notivue/notification.css'
 import 'notivue/animations.css'
+import 'vue-tel-input/vue-tel-input.css'
 
 const app = createApp(App)
 const notivue = createNotivue({
@@ -24,9 +26,12 @@ const notivue = createNotivue({
   },
 });
 
+
 app.use(notivue);
 app.use(createPinia())
 app.use(router)
+app.use(VueTelInput)
+
 VueQueryPlugin.install(app,
   {
     queryClientConfig:{

@@ -1,16 +1,22 @@
+import type { PhoneMeta } from 'vue-tel-input'
+
 export interface SupplierForm {
   name: string,
   ruc: string,
   address: string,
-  phone: string
+  phone: PhoneMeta | string
 }
 
-export interface Supplier{
-  id : number,
+export interface SupplierData {
+  id: number
   name: string,
   ruc: string,
   address: string,
-  phone: string
+  phone: PhoneMeta | string
+}
+
+export interface Supplier extends SupplierData {
+  phone_number: string
 }
 
 export interface filterSupplier {

@@ -1,4 +1,4 @@
-import { type filterSupplier, type Supplier, type SupplierForm } from '../types/Supplier'
+import { type filterSupplier, type Supplier, type SupplierData, type SupplierForm } from '../types/Supplier'
 import { farmashopApi } from '@/api/axios.ts'
 import type { PaginatedApiResponse } from '@/types/Response.ts'
 
@@ -17,7 +17,7 @@ export const supplierService= () => {
         const { data: newSupplier } = await farmashopApi.post<Supplier>(route, supplier)
         return newSupplier
       },
-      updateSupplier: async (supplier: Supplier) => {
+      updateSupplier: async (supplier: SupplierData) => {
         const { data: supplierEdit } = await farmashopApi.put<Supplier>(`${route}/${supplier.id}`, supplier)
         return supplierEdit
       },

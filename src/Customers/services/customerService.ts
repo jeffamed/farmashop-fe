@@ -1,4 +1,4 @@
-import { type filterCustomer, type Customer, type CustomerForm } from '../types/Customer'
+import { type filterCustomer, type Customer, type CustomerData, type CustomerForm } from '../types/Customer'
 import { farmashopApi } from '@/api/axios.ts'
 import type { PaginatedApiResponse } from '@/types/Response.ts'
 
@@ -17,7 +17,7 @@ export const customerService= () => {
         const { data: newCustomer } = await farmashopApi.post<Customer>(route, customer)
         return newCustomer
       },
-      updateCustomer: async (customer: Customer) => {
+      updateCustomer: async (customer: CustomerData) => {
         const { data: customerEdit } = await farmashopApi.put<Customer>(`${route}/${customer.id}`, customer)
         return customerEdit
       },
