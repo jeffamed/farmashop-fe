@@ -114,7 +114,6 @@ watch(
             >
             <vue-tel-input
               id="txtPhone"
-              class="block w-full rounded-full border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:outline-none focus:ring-3 focus:ring-brand-500/10 dark:border-gray-700 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-800"
               v-model="phoneInput"
               :inputOptions="{ placeholder: 'Teléfono del proveedor' }"
               @on-input="handlePhoneInput"
@@ -139,4 +138,42 @@ watch(
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+@reference "@/assets/main.css";
+
+.vue-tel-input {
+  @apply flex w-full items-center rounded-full border border-gray-300 bg-transparent text-sm text-gray-800 transition dark:border-gray-700 dark:bg-white/5 dark:text-white/90;
+}
+
+.vue-tel-input:focus-within {
+  @apply border-brand-300 ring-3 ring-brand-500/10 dark:border-brand-800;
+}
+
+.vue-tel-input :deep(.vti__dropdown) {
+  @apply rounded-l-full py-2.5 pr-2 pl-4 hover:bg-gray-50 dark:hover:bg-white/5;
+}
+
+.vue-tel-input :deep(.vti__dropdown-arrow) {
+  @apply text-gray-400 dark:text-gray-500;
+}
+
+.vue-tel-input :deep(.vti__dropdown-list) {
+  @apply z-50 mt-2 max-h-60 w-72 max-w-[90vw] overflow-y-auto rounded-lg border border-gray-200 bg-white p-1 text-sm shadow-theme-lg dark:border-gray-700 dark:bg-gray-dark;
+}
+
+.vue-tel-input :deep(.vti__dropdown-item) {
+  @apply flex items-center gap-2 rounded-md px-3 py-2 text-gray-700 dark:text-gray-300;
+}
+
+.vue-tel-input :deep(.vti__dropdown-item.highlighted) {
+  @apply bg-gray-100 dark:bg-white/5;
+}
+
+.vue-tel-input :deep(.vti__country-code) {
+  @apply text-gray-400 dark:text-gray-500;
+}
+
+.vue-tel-input :deep(.vti__input) {
+  @apply w-full rounded-r-full bg-transparent py-2.5 pr-4 text-sm text-gray-800 outline-none placeholder:text-gray-400 dark:text-white/90 dark:placeholder:text-gray-500;
+}
+</style>

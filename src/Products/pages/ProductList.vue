@@ -27,6 +27,8 @@ const title = ref<string>('Productos')
         </template>
       </PageHeader>
     </div>
+    <div class="col-span-12">
+    </div>
   </div>
 </template>
 <style scoped></style>
