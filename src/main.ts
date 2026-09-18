@@ -12,6 +12,7 @@ import { VueQueryPlugin } from '@tanstack/vue-query'
 import 'notivue/notification.css'
 import 'notivue/animations.css'
 import 'vue-tel-input/vue-tel-input.css'
+import 'vue-multiselect/dist/vue-multiselect.css'
 
 const app = createApp(App)
 const notivue = createNotivue({

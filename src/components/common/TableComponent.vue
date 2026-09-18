@@ -177,12 +177,12 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
           class="flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5"
           @click="toggleMoreFilterDropdown"
         >
-          Filtros
           <AppIcon name="filter" class="h-4 w-4 shrink-0" />
+          Filtros
         </button>
         <div
           v-if="moreFilterDropdownOpen"
-          class="absolute right-0 z-10 mt-2 min-w-[16rem] rounded-xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+          class="absolute right-0 z-10 mt-2 min-w-[22rem] rounded-xl border border-gray-200 bg-white p-4 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
         >
           <slot name="filters"></slot>
         </div>

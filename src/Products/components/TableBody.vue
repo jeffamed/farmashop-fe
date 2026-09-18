@@ -33,6 +33,10 @@ const handleClickOutside = (event: MouseEvent) => {
   }
 }
 
+const formatCurrent = (value: number) => {
+  return value.toFixed(2)
+}
+
 const confirmDelete = (productToDelete: ProductLists) => {
   product.value = productToDelete
   showDeleteModal.value = true
@@ -75,7 +79,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
     <td
       class="whitespace-nowrap px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90 sm:px-6"
     >
-      C$ {{ product.unit_price }}
+      C$ {{ formatCurrent(product.unit_price) }}
     </td>
     <td class="whitespace-nowrap px-5 py-4 sm:px-6">
       <BadgeStock :stock="product.stock" />

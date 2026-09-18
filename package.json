@@ -24,6 +24,7 @@
     "notivue": "^2.4.5",
     "pinia": "^3.0.4",
     "vue": "^3.5.28",
+    "vue-multiselect": "^3.5.0",
     "vue-router": "^5.0.2",
     "vue-tel-input": "^9.8.0"
   },
