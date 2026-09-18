@@ -29,6 +29,7 @@ export type IconName =
   | "error"
   | "eye"
   | "eye-close"
+  | "filter"
   | "flag"
   | "folder"
   | "grid"

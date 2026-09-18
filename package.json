@@ -19,6 +19,7 @@
     "@n8n/chat": "^1.14.0",
     "@tanstack/vue-query": "^5.102.8",
     "@tanstack/vue-query-devtools": "^6.1.48",
+    "@uppy/vue": "^4.0.0",
     "axios": "^1.13.6",
     "notivue": "^2.4.5",
     "pinia": "^3.0.4",

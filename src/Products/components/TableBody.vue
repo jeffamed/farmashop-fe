@@ -1,414 +1,129 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import AppIcon from '@/components/icons/AppIcon.vue'
+import BadgeStock from './BadgeStock.vue'
+import { useProduct } from '@/Products/composables/useProduct.ts'
+import { onMounted, onUnmounted, ref } from 'vue'
+import DeleteModal from '@/components/common/Modals/DeleteModal.vue'
+import type { ProductLists } from '@/Products/types/Product.ts'
+import { push } from 'notivue'
+
+const { products, deleteProduct } = useProduct()
+
+const openActionsId = ref<number | string | null>(null)
+const actionsMenuRef = ref<HTMLElement | null>(null)
+
+const showDeleteModal = ref(false)
+const product = ref<ProductLists>({
+  id: 0,
+  name: '',
+  code: '',
+  laboratory: '',
+  type: '',
+  unit_price: 0,
+  stock: 0,
+})
+
+const toggleActionsMenu = (id: number | string) => {
+  openActionsId.value = openActionsId.value === id ? null : id
+}
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (actionsMenuRef.value && !actionsMenuRef.value.contains(event.target as Node)) {
+    openActionsId.value = null
+  }
+}
+
+const confirmDelete = (productToDelete: ProductLists) => {
+  product.value = productToDelete
+  showDeleteModal.value = true
+}
+
+const handleDelete = (deleteRegister: boolean) => {
+  if (deleteRegister) {
+    deleteProduct.mutate(product.value.id, {
+      onSuccess: () => {
+        push.success('Producto eliminado correctamente')
+      },
+      onError: () => {
+        push.error('Ocurrió un error al eliminar el producto')
+      },
+    })
+  }
+  showDeleteModal.value = false
+}
+
+onMounted(() => document.addEventListener('click', handleClickOutside))
+onUnmounted(() => document.removeEventListener('click', handleClickOutside))
+</script>
 
 <template>
-  <div> el contenidod de la tabla esta comentado aqui</div>
-  <!-- Table -->
-  <!--<div class="overflow-x-auto">
-    <table class="w-full text-left">
-      <thead>
-        <tr class="border-b border-gray-200 dark:border-gray-800">
-          <th
-            class="whitespace-nowrap px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:px-6"
+  <tr
+    class="hover:bg-gray-50 dark:hover:bg-white/[0.03]"
+    v-for="product in products"
+    :key="product.id"
+  >
+    <td class="whitespace-nowrap px-5 py-4 sm:px-6">
+      <p class="font-medium text-gray-800 dark:text-white/90">{{ product.name }}</p>
+      <p class="text-xs text-gray-400 dark:text-gray-500">{{ product.code }}</p>
+    </td>
+    <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+      {{ product.laboratory }}
+    </td>
+    <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
+      {{ product.type }}
+    </td>
+    <td
+      class="whitespace-nowrap px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90 sm:px-6"
+    >
+      C$ {{ product.unit_price }}
+    </td>
+    <td class="whitespace-nowrap px-5 py-4 sm:px-6">
+      <BadgeStock :stock="product.stock" />
+    </td>
+    <td class="whitespace-nowrap px-5 py-4 sm:px-6">
+      <div class="flex items-center justify-end gap-1">
+        <button
+          type="button"
+          class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
+        >
+          <AppIcon name="edit" class="h-4 w-4" />
+          <span class="sr-only">Editar</span>
+        </button>
+        <button
+          type="button"
+          class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
+          @click.prevent="confirmDelete(product)"
+        >
+          <AppIcon name="trash" class="h-4 w-4" />
+          <span class="sr-only">Eliminar</span>
+        </button>
+        <div
+          class="relative"
+          :ref="
+            (el) => {
+              if (openActionsId === product.id) actionsMenuRef = el as HTMLElement
+            }
+          "
+        >
+          <button
+            type="button"
+            class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
+            @click="toggleActionsMenu(product.id)"
           >
-            Producto
-          </th>
-          <th
-            class="whitespace-nowrap px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:px-6"
+            <AppIcon name="horizontal-dots" class="h-4 w-4" />
+            <span class="sr-only">Más opciones</span>
+          </button>
+          <div
+            v-if="openActionsId === product.id"
+            class="absolute right-0 z-10 mt-2 w-44 rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
           >
-            Laboratorio
-          </th>
-          <th
-            class="whitespace-nowrap px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Categoría
-          </th>
-          <th
-            class="whitespace-nowrap px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Precio
-          </th>
-          <th
-            class="whitespace-nowrap px-5 py-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Estado
-          </th>
-          <th
-            class="whitespace-nowrap px-5 py-3 text-right text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Opciones
-          </th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200 dark:divide-gray-800">
-        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.03]">
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <p class="font-medium text-gray-800 dark:text-white/90">Acetaminofén 500mg</p>
-            <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1042</p>
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Lab Génesis
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Analgésicos
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90 sm:px-6"
-          >
-            C$ 12.50
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <span
-              class="inline-flex items-center rounded-full bg-success-50 px-2.5 py-1 text-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500"
-            >
-              Disponible · 240
-            </span>
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <div class="flex items-center justify-end gap-1">
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <path
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
-                  />
-                </svg>
-                <span class="sr-only">Editar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="trash" class="h-4 w-4" />
-                <span class="sr-only">Eliminar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="horizontal-dots" class="h-4 w-4" />
-                <span class="sr-only">Más opciones</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.03]">
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <p class="font-medium text-gray-800 dark:text-white/90">Amoxicilina 250mg susp.</p>
-            <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1043</p>
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            FarmaNova
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Antibióticos
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90 sm:px-6"
-          >
-            C$ 45.00
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <span
-              class="inline-flex items-center rounded-full bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-700 dark:bg-warning-500/15 dark:text-warning-500"
-            >
-              Stock bajo · 18
-            </span>
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <div class="flex items-center justify-end gap-1">
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <path
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
-                  />
-                </svg>
-                <span class="sr-only">Editar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="trash" class="h-4 w-4" />
-                <span class="sr-only">Eliminar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="horizontal-dots" class="h-4 w-4" />
-                <span class="sr-only">Más opciones</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.03]">
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <p class="font-medium text-gray-800 dark:text-white/90">Ibuprofeno 400mg</p>
-            <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1044</p>
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Lab Génesis
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Analgésicos
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90 sm:px-6"
-          >
-            C$ 22.75
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <span
-              class="inline-flex items-center rounded-full bg-error-50 px-2.5 py-1 text-xs font-medium text-error-700 dark:bg-error-500/15 dark:text-error-500"
-            >
-              Agotado · 0
-            </span>
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <div class="flex items-center justify-end gap-1">
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <path
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
-                  />
-                </svg>
-                <span class="sr-only">Editar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="trash" class="h-4 w-4" />
-                <span class="sr-only">Eliminar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="horizontal-dots" class="h-4 w-4" />
-                <span class="sr-only">Más opciones</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.03]">
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <p class="font-medium text-gray-800 dark:text-white/90">Loratadina 10mg</p>
-            <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1045</p>
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Vitalis
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Antihistamínicos
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90 sm:px-6"
-          >
-            C$ 18.90
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <span
-              class="inline-flex items-center rounded-full bg-success-50 px-2.5 py-1 text-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500"
-            >
-              Disponible · 96
-            </span>
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <div class="flex items-center justify-end gap-1">
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <path
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
-                  />
-                </svg>
-                <span class="sr-only">Editar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="trash" class="h-4 w-4" />
-                <span class="sr-only">Eliminar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="horizontal-dots" class="h-4 w-4" />
-                <span class="sr-only">Más opciones</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.03]">
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <p class="font-medium text-gray-800 dark:text-white/90">Omeprazol 20mg</p>
-            <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1046</p>
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            FarmaNova
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Gastro
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90 sm:px-6"
-          >
-            C$ 34.40
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <span
-              class="inline-flex items-center rounded-full bg-warning-50 px-2.5 py-1 text-xs font-medium text-warning-700 dark:bg-warning-500/15 dark:text-warning-500"
-            >
-              Stock bajo · 7
-            </span>
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <div class="flex items-center justify-end gap-1">
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <path
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
-                  />
-                </svg>
-                <span class="sr-only">Editar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="trash" class="h-4 w-4" />
-                <span class="sr-only">Eliminar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="horizontal-dots" class="h-4 w-4" />
-                <span class="sr-only">Más opciones</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr class="hover:bg-gray-50 dark:hover:bg-white/[0.03]">
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <p class="font-medium text-gray-800 dark:text-white/90">Suero oral 500ml</p>
-            <p class="text-xs text-gray-400 dark:text-gray-500">PRD-1047</p>
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Hidralab
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6"
-          >
-            Hidratación
-          </td>
-          <td
-            class="whitespace-nowrap px-5 py-4 text-sm font-medium text-gray-800 dark:text-white/90 sm:px-6"
-          >
-            C$ 9.99
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <span
-              class="inline-flex items-center rounded-full bg-success-50 px-2.5 py-1 text-xs font-medium text-success-700 dark:bg-success-500/15 dark:text-success-500"
-            >
-              Disponible · 310
-            </span>
-          </td>
-          <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-            <div class="flex items-center justify-end gap-1">
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
-                  <path
-                    stroke="currentColor"
-                    stroke-width="1.5"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"
-                  />
-                </svg>
-                <span class="sr-only">Editar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="trash" class="h-4 w-4" />
-                <span class="sr-only">Eliminar</span>
-              </button>
-              <button
-                type="button"
-                class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
-              >
-                <AppIcon name="horizontal-dots" class="h-4 w-4" />
-                <span class="sr-only">Más opciones</span>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>-->
+            <slot name="rowActions" :product="product"></slot>
+          </div>
+        </div>
+      </div>
+    </td>
+  </tr>
+  <DeleteModal :show="showDeleteModal" :label="product.name" @onConfirm="handleDelete" />
 </template>
 
 <style scoped></style>

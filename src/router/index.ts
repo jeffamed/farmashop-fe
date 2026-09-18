@@ -24,6 +24,7 @@ const router = createRouter({
     {
       path: '',
       component: AdminLayout,
+      meta: { requiresAuth: true },
       children: [
         {
           path: '/',
@@ -144,7 +145,6 @@ router.beforeEach(async (to) => {
   }
 
   if(to.name === 'login' && authStore.isAuthenticated){
-    console.log('authenticated')
     return {
       name: 'home'
     }

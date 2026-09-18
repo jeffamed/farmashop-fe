@@ -19,10 +19,12 @@ interface Props {
   fieldOptions?: FieldOption[]
   filterSearch: FilterSearch
   pagination?: Meta
+  activeMoreFilter?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   fieldOptions: () => [],
+  activeMoreFilter: false,
 })
 
 const emit = defineEmits<{
@@ -33,6 +35,8 @@ const selectedField = ref('')
 const search = ref('')
 const fieldDropdownOpen = ref(false)
 const fieldDropdownRef = ref<HTMLElement | null>(null)
+const moreFilterDropdownOpen = ref(false)
+const moreFilterDropdownRef = ref<HTMLElement | null>(null)
 const debouncedSearch = useDebouncedRef(search)
 const newPage = ref<number>(1)
 
@@ -49,9 +53,19 @@ const selectField = (field: FieldOption) => {
   fieldDropdownOpen.value = false
 }
 
+const toggleMoreFilterDropdown = () => {
+  moreFilterDropdownOpen.value = !moreFilterDropdownOpen.value
+}
+
 const handleClickOutside = (event: MouseEvent) => {
   if (fieldDropdownRef.value && !fieldDropdownRef.value.contains(event.target as Node)) {
     fieldDropdownOpen.value = false
+  }
+  if (
+    moreFilterDropdownRef.value &&
+    !moreFilterDropdownRef.value.contains(event.target as Node)
+  ) {
+    moreFilterDropdownOpen.value = false
   }
 }
 
@@ -157,22 +171,22 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
         />
       </div>
 
-      <button
-        v-if="false"
-        type="button"
-        class="flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5"
-      >
-        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
-          <path
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 3c2.755 0 5.455.232 8.083.678.533.09.917.556.917 1.096v1.044a2.25 2.25 0 0 1-.659 1.591l-5.432 5.432a2.25 2.25 0 0 0-.659 1.591v2.927a2.25 2.25 0 0 1-1.244 2.013L9.75 21v-6.568a2.25 2.25 0 0 0-.659-1.591L3.659 7.409A2.25 2.25 0 0 1 3 5.818V4.774c0-.54.384-1.006.917-1.096A48.32 48.32 0 0 1 12 3Z"
-          />
-        </svg>
-        Filtros
-      </button>
+      <div v-if="activeMoreFilter" ref="moreFilterDropdownRef" class="relative shrink-0">
+        <button
+          type="button"
+          class="flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5"
+          @click="toggleMoreFilterDropdown"
+        >
+          Filtros
+          <AppIcon name="filter" class="h-4 w-4 shrink-0" />
+        </button>
+        <div
+          v-if="moreFilterDropdownOpen"
+          class="absolute right-0 z-10 mt-2 min-w-[16rem] rounded-xl border border-gray-200 bg-white p-3 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+        >
+          <slot name="filters"></slot>
+        </div>
+      </div>
     </div>
 
     <div class="overflow-x-auto">
@@ -220,7 +234,7 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
         <button
           type="button"
           v-for="page in pages"
-          class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium "
+          class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
           :key="page"
           :class="[
             page === props.pagination?.current_page
