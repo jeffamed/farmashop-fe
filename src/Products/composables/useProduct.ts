@@ -31,6 +31,10 @@ export const useProduct = () => {
     }
   })
 
+  const createProduct = useMutation({
+    mutationFn: service.saveProduct,
+  })
+
   return{
     productsData,
     products,
@@ -38,6 +42,7 @@ export const useProduct = () => {
     pagination,
     filter,
     deleteProduct,
+    createProduct
   }
 
 }

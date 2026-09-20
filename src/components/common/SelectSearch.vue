@@ -1,24 +1,10 @@
 <script setup lang="ts">
-import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
+import type { SearchSelectProp, OptionValue, SelectOption } from '@/types/Component.ts'
+import { selectSizeClasses } from '@/components/config/selectSizeClasses'
 
-type OptionValue = string | number
-type SelectOption = Record<string, any>
-type SelectSize = 'sm' | 'md' | 'lg'
-
-interface Props {
-  modelValue?: OptionValue | OptionValue[] | null
-  options: SelectOption[]
-  multiple?: boolean
-  placeholder?: string
-  searchPlaceholder?: string
-  label?: string
-  trackBy?: string
-  helperText?: string
-  size?: SelectSize
-}
-
-const props = withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<SearchSelectProp>(), {
   modelValue: null,
   multiple: false,
   placeholder: 'Seleccione una opción',
@@ -27,66 +13,25 @@ const props = withDefaults(defineProps<Props>(), {
   trackBy: 'id',
   helperText: 'Escribe para buscar y selecciona uno o varios.',
   size: 'md',
-})
-
-const sizeClasses = computed(() => {
-  const sizes: Record<SelectSize, Record<string, string>> = {
-    sm: {
-      trigger: 'px-3 py-2 text-xs',
-      triggerIcon: 'h-3.5 w-3.5',
-      searchInput: 'py-1 pr-2 pl-8 text-xs',
-      searchIcon: 'left-3 h-3.5 w-3.5',
-      option: 'px-2.5 py-1.5 text-xs',
-      optionCheck: 'h-3.5 w-3.5',
-      optionCheckIcon: 'h-2 w-2',
-      chip: 'py-0.5 pr-1.5 pl-2.5 text-[11px]',
-      chipIcon: 'h-3.5 w-3.5',
-      chipIconInner: 'h-2.5 w-2.5',
-    },
-    md: {
-      trigger: 'px-4 py-3 text-sm',
-      triggerIcon: 'h-4 w-4',
-      searchInput: 'py-2 pr-2 pl-9 text-sm',
-      searchIcon: 'left-3.5 h-4 w-4',
-      option: 'px-3 py-2.5 text-sm',
-      optionCheck: 'h-4 w-4',
-      optionCheckIcon: 'h-2.5 w-2.5',
-      chip: 'py-1 pr-2 pl-3 text-xs',
-      chipIcon: 'h-4 w-4',
-      chipIconInner: 'h-3 w-3',
-    },
-    lg: {
-      trigger: 'px-5 py-3.5 text-base',
-      triggerIcon: 'h-5 w-5',
-      searchInput: 'py-2.5 pr-2 pl-10 text-base',
-      searchIcon: 'left-4 h-5 w-5',
-      option: 'px-4 py-3 text-base',
-      optionCheck: 'h-5 w-5',
-      optionCheckIcon: 'h-3 w-3',
-      chip: 'py-1.5 pr-2.5 pl-3.5 text-sm',
-      chipIcon: 'h-5 w-5',
-      chipIconInner: 'h-3.5 w-3.5',
-    },
-  }
-  return sizes[props.size]
+  search: '',
 })
 
 const emit = defineEmits<{
   'update:modelValue': [value: OptionValue | OptionValue[] | null]
+  'update:search': [value: string]
 }>()
 
+const sizeClasses = computed(() => selectSizeClasses[props.size])
+
 const isOpen = ref(false)
-const search = ref('')
+const searchInput = ref('')
 const rootRef = ref<HTMLElement | null>(null)
 const searchInputRef = ref<HTMLInputElement | null>(null)
 
 const selectedValues = computed<OptionValue[]>(() => {
-  if (props.multiple) {
-    return Array.isArray(props.modelValue) ? props.modelValue : []
-  }
-  return props.modelValue !== null && props.modelValue !== undefined && props.modelValue !== ''
-    ? [props.modelValue as OptionValue]
-    : []
+  if (props.multiple) return Array.isArray(props.modelValue) ? props.modelValue : []
+
+  return props.modelValue !== null && props.modelValue !== undefined && props.modelValue !== '' ? [props.modelValue as OptionValue] : []
 })
 
 const selectedOptions = computed(() =>
@@ -94,11 +39,9 @@ const selectedOptions = computed(() =>
 )
 
 const filteredOptions = computed(() => {
-  const term = search.value.trim().toLowerCase()
+  const term = searchInput.value.trim().toLowerCase()
   if (!term) return props.options
-  return props.options.filter((option) =>
-    String(option[props.label]).toLowerCase().includes(term),
-  )
+  return props.options.filter((option) => String(option[props.label]).toLowerCase().includes(term))
 })
 
 const hasSelection = computed(() => selectedOptions.value.length > 0)
@@ -106,7 +49,7 @@ const hasSelection = computed(() => selectedOptions.value.length > 0)
 const triggerLabel = computed(() => {
   if (props.multiple) {
     const count = selectedOptions.value.length
-    return count ? `${count} seleccionado${count > 1 ? 's' : ''}` : props.placeholder
+    return count ? `${count} seleccionado ${count > 1 ? 's' : ''}` : props.placeholder
   }
   return selectedOptions.value[0]?.[props.label] ?? props.placeholder
 })
@@ -122,7 +65,7 @@ function openDropdown() {
 
 function closeDropdown() {
   isOpen.value = false
-  search.value = ''
+  searchInput.value = ''
 }
 
 function toggleDropdown() {
@@ -173,6 +116,10 @@ function handleKeydown(event: KeyboardEvent) {
   }
 }
 
+watch(searchInput, (search) => {
+  emit('update:search', search)
+})
+
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
   document.addEventListener('keydown', handleKeydown)
@@ -216,7 +163,7 @@ onUnmounted(() => {
         />
         <input
           ref="searchInputRef"
-          v-model="search"
+          v-model="searchInput"
           type="text"
           :placeholder="searchPlaceholder"
           class="w-full rounded-lg border-0 bg-transparent text-gray-800 placeholder:text-gray-400 focus:outline-none dark:text-white/90 dark:placeholder:text-gray-500"

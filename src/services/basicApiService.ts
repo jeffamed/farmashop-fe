@@ -16,10 +16,15 @@ export interface PayloadUsage {
 export const basicApiService = <T=StandardData> (endpoint: Endpoint) => {
     return {
       getList: async (search?: string) => {
-        const { data } = await farmashopApi.get<ApiResponse<T[]>>(
-          `/api/v1/${endpoint}`,
-          { params: { search } },
-        )
+        const { data } = await farmashopApi.get<ApiResponse<T[]>>(`/api/v1/${endpoint}`, {
+          params: { search },
+        })
+        return data.data
+      },
+      searchData: async (search?: string) => {
+        const { data } = await farmashopApi.get<ApiResponse<T[]>>(`/api/v1/${endpoint}`, {
+          params: { search, needPagination: 0, limit: 20 },
+        })
         return data.data
       },
       getOne: async (id: string | number) => {
@@ -33,7 +38,6 @@ export const basicApiService = <T=StandardData> (endpoint: Endpoint) => {
       deleteData: async (id: string | number) => {
         console.info(`Deleting ${endpoint} with id: ${id}`)
         await farmashopApi.delete(`/api/v1/${endpoint}/${id}`)
-        //return data
       },
       updateData: async (id: string | number, payload: Payload | PayloadUsage) => {
         const { data } = await farmashopApi.put(`/api/v1/${endpoint}/${id}`, payload)

@@ -36,7 +36,6 @@ const search = ref('')
 const fieldDropdownOpen = ref(false)
 const fieldDropdownRef = ref<HTMLElement | null>(null)
 const moreFilterDropdownOpen = ref(false)
-const moreFilterDropdownRef = ref<HTMLElement | null>(null)
 const debouncedSearch = useDebouncedRef(search)
 const newPage = ref<number>(1)
 
@@ -60,12 +59,6 @@ const toggleMoreFilterDropdown = () => {
 const handleClickOutside = (event: MouseEvent) => {
   if (fieldDropdownRef.value && !fieldDropdownRef.value.contains(event.target as Node)) {
     fieldDropdownOpen.value = false
-  }
-  if (
-    moreFilterDropdownRef.value &&
-    !moreFilterDropdownRef.value.contains(event.target as Node)
-  ) {
-    moreFilterDropdownOpen.value = false
   }
 }
 
@@ -171,19 +164,30 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
         />
       </div>
 
-      <div v-if="activeMoreFilter" ref="moreFilterDropdownRef" class="relative shrink-0">
+      <div v-if="activeMoreFilter" class="shrink-0">
         <button
           type="button"
-          class="flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5"
+          class="flex h-11 shrink-0 items-center justify-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors"
+          :class="
+            moreFilterDropdownOpen
+              ? 'border-brand-300 bg-brand-50 text-brand-600 dark:border-brand-800 dark:bg-brand-500/10 dark:text-brand-400'
+              : 'border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5'
+          "
           @click="toggleMoreFilterDropdown"
         >
           <AppIcon name="filter" class="h-4 w-4 shrink-0" />
           Filtros
         </button>
-        <div
-          v-if="moreFilterDropdownOpen"
-          class="absolute right-0 z-10 mt-2 min-w-[22rem] rounded-xl border border-gray-200 bg-white p-4 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
-        >
+      </div>
+    </div>
+
+    <div
+      v-if="activeMoreFilter"
+      class="grid transition-all duration-300 ease-in-out"
+      :class="moreFilterDropdownOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
+    >
+      <div class="overflow-hidden">
+        <div class="border-b border-gray-200 p-4 dark:border-gray-800 sm:p-5">
           <slot name="filters"></slot>
         </div>
       </div>

@@ -2,9 +2,23 @@
 import AppIcon from '@/components/icons/AppIcon.vue'
 import router from '@/router'
 import type { ProductForm } from '@/Products/types/Product.ts'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import CardContent from '@/components/common/CardContent.vue'
 import SelectSearch from '@/components/common/SelectSearch.vue'
+import { useProduct } from '@/Products/composables/useProduct.ts'
+import { useTypeProductSearch } from '@/Products/composables/useTypeProductSearch.ts'
+
+const { createProduct } = useProduct()
+const { search, typeProducts } = useTypeProductSearch()
+
+const searching = ref({
+  type_product: '',
+  supplier: '',
+  laboratory: '',
+  presentation: '',
+  location: '',
+  usage: '',
+})
 
 const form = ref<ProductForm>({
   code: '',
@@ -20,6 +34,17 @@ const form = ref<ProductForm>({
   type_id: 0,
   usages: [],
 })
+
+const saveProduct = () => {
+  createProduct.mutate(form.value)
+}
+
+watch(
+  () => searching.value.type_product,
+  (searchType) => {
+    search.value = searchType
+  },
+)
 </script>
 
 <template>
@@ -46,7 +71,7 @@ const form = ref<ProductForm>({
     <CardContent title="Identificación">
       <div>
         <label class="mb-2.5 block text-sm font-medium text-gray-800 dark:text-white/90">
-          Código <span class="text-error-500">*</span>
+          Código
         </label>
         <input
           type="text"
@@ -118,8 +143,8 @@ const form = ref<ProductForm>({
           </label>
           <SelectSearch
             v-model="form.supplier_id"
+            v-model:search="searching.supplier"
             :options="[]"
-            :multiple="false"
             placeholder="Seleccione el proveedor"
             search-placeholder="Buscar proveedor..."
             label="name"
@@ -132,8 +157,8 @@ const form = ref<ProductForm>({
           </label>
           <SelectSearch
             v-model="form.laboratory_id"
+            v-model:search="searching.laboratory"
             :options="[]"
-            :multiple="false"
             placeholder="Seleccione el laboratorio"
             search-placeholder="Buscar laboratorio..."
             label="name"
@@ -146,8 +171,8 @@ const form = ref<ProductForm>({
           </label>
           <SelectSearch
             v-model="form.presentation_id"
+            v-model:search="searching.presentation"
             :options="[]"
-            :multiple="false"
             placeholder="Seleccione la presentación"
             search-placeholder="Buscar presentación..."
             label="name"
@@ -171,8 +196,8 @@ const form = ref<ProductForm>({
           </div>
           <SelectSearch
             v-model="form.location_id"
+            v-model:search="searching.location"
             :options="[]"
-            :multiple="false"
             placeholder="Seleccione la ubicación"
             search-placeholder="Buscar ubicación..."
             label="name"
@@ -185,8 +210,8 @@ const form = ref<ProductForm>({
           </label>
           <SelectSearch
             v-model="form.type_id"
-            :options="[]"
-            :multiple="false"
+            v-model:search="searching.type_product"
+            :options="typeProducts ?? []"
             placeholder="Seleccione el tipo"
             search-placeholder="Buscar tipo..."
             label="name"
@@ -213,6 +238,7 @@ const form = ref<ProductForm>({
         </label>
         <SelectSearch
           v-model="form.usages"
+          v-model:search="searching.usage"
           :options="[]"
           :multiple="true"
           placeholder="Seleccione los usos"
@@ -236,6 +262,7 @@ const form = ref<ProductForm>({
       <button
         type="button"
         class="inline-flex items-center gap-2 rounded-full bg-brand-500 px-5 py-2.5 text-sm font-medium text-white hover:bg-brand-600"
+        @click.prevent="saveProduct"
       >
         <AppIcon name="download" class="h-4 w-4" />
         Guardar producto
