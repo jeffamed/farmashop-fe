@@ -1,3 +1,5 @@
+import type { StandardData } from '@/types/StandardData.ts'
+
 export interface ProductForm{
   code: string
   name: string
@@ -27,5 +29,15 @@ export interface Filter {
   name: string
   code: string
   laboratory: string
+}
+
+export interface MetaOptions {
+  types: StandardData[]
+  locations: StandardData[]
+  usages: StandardData[]
+  presentations: StandardData[]
+  laboratories: StandardData[]
+  suppliers: StandardData[]
+  //suppliers: Record<string, string | number>[]
 }
 

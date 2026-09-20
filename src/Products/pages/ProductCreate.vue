@@ -2,23 +2,19 @@
 import AppIcon from '@/components/icons/AppIcon.vue'
 import router from '@/router'
 import type { ProductForm } from '@/Products/types/Product.ts'
-import { ref, watch } from 'vue'
+import { ref } from 'vue'
 import CardContent from '@/components/common/CardContent.vue'
 import SelectSearch from '@/components/common/SelectSearch.vue'
 import { useProduct } from '@/Products/composables/useProduct.ts'
-import { useTypeProductSearch } from '@/Products/composables/useTypeProductSearch.ts'
+import { useOptionsSearch } from '@/Products/composables/useOptionsSearch.ts'
 
 const { createProduct } = useProduct()
-const { search, typeProducts } = useTypeProductSearch()
-
-const searching = ref({
-  type_product: '',
-  supplier: '',
-  laboratory: '',
-  presentation: '',
-  location: '',
-  usage: '',
-})
+const { search: searchSupplier, options: suppliers } = useOptionsSearch('suppliers')
+const { search: searchLaboratory, options: laboratories } = useOptionsSearch('laboratories')
+const { search: searchPresentation, options: presentations } = useOptionsSearch('presentations')
+const { search: searchLocation, options: locations } = useOptionsSearch('locations')
+const { search: searchType, options: typeProducts } = useOptionsSearch('types')
+const { search: searchUsage, options: usages } = useOptionsSearch('usages')
 
 const form = ref<ProductForm>({
   code: '',
@@ -38,13 +34,6 @@ const form = ref<ProductForm>({
 const saveProduct = () => {
   createProduct.mutate(form.value)
 }
-
-watch(
-  () => searching.value.type_product,
-  (searchType) => {
-    search.value = searchType
-  },
-)
 </script>
 
 <template>
@@ -143,8 +132,8 @@ watch(
           </label>
           <SelectSearch
             v-model="form.supplier_id"
-            v-model:search="searching.supplier"
-            :options="[]"
+            v-model:search="searchSupplier"
+            :options="suppliers"
             placeholder="Seleccione el proveedor"
             search-placeholder="Buscar proveedor..."
             label="name"
@@ -157,8 +146,8 @@ watch(
           </label>
           <SelectSearch
             v-model="form.laboratory_id"
-            v-model:search="searching.laboratory"
-            :options="[]"
+            v-model:search="searchLaboratory"
+            :options="laboratories"
             placeholder="Seleccione el laboratorio"
             search-placeholder="Buscar laboratorio..."
             label="name"
@@ -171,8 +160,8 @@ watch(
           </label>
           <SelectSearch
             v-model="form.presentation_id"
-            v-model:search="searching.presentation"
-            :options="[]"
+            v-model:search="searchPresentation"
+            :options="presentations"
             placeholder="Seleccione la presentación"
             search-placeholder="Buscar presentación..."
             label="name"
@@ -196,8 +185,8 @@ watch(
           </div>
           <SelectSearch
             v-model="form.location_id"
-            v-model:search="searching.location"
-            :options="[]"
+            v-model:search="searchLocation"
+            :options="locations"
             placeholder="Seleccione la ubicación"
             search-placeholder="Buscar ubicación..."
             label="name"
@@ -210,8 +199,8 @@ watch(
           </label>
           <SelectSearch
             v-model="form.type_id"
-            v-model:search="searching.type_product"
-            :options="typeProducts ?? []"
+            v-model:search="searchType"
+            :options="typeProducts"
             placeholder="Seleccione el tipo"
             search-placeholder="Buscar tipo..."
             label="name"
@@ -238,12 +227,12 @@ watch(
         </label>
         <SelectSearch
           v-model="form.usages"
-          v-model:search="searching.usage"
-          :options="[]"
+          v-model:search="searchUsage"
+          :options="usages"
           :multiple="true"
           placeholder="Seleccione los usos"
           search-placeholder="Buscar uso..."
-          label="name"
+          label="description"
           track-by="id"
           helper-text="Escribe para buscar y selecciona uno o varios."
         />

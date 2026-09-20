@@ -3,7 +3,7 @@ import type { ApiResponse } from '@/types/Response.ts'
 import type { StandardData } from '@/types/StandardData.ts'
 import type { Usage } from '@/Usages/stores/usage.store.ts'
 
-type Endpoint = 'locations' | 'usages' | 'presentations' | 'types'
+export type Endpoint = 'locations' | 'usages' | 'presentations' | 'types' | 'suppliers' | 'laboratories'
 
 export interface Payload {
   name: string

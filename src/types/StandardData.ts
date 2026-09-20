@@ -3,7 +3,6 @@ export interface StandardData {
   name: string
 }
 
-
 export interface Filter{
   input: string
   search: string
