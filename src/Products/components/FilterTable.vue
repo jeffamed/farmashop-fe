@@ -1,17 +1,45 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import SelectSearch from '@/components/common/SelectSearch.vue'
+import { useOptionsSearch } from '@/Products/composables/useOptionsSearch.ts'
+import type { MoreFilter } from '@/Products/types/Product.ts'
+
+const emit = defineEmits<{
+  filter_availability: [filters: MoreFilter]
+}>();
+
+const { search: searchType, options: typeProducts } = useOptionsSearch('types')
+const { search: searchUsage, options: usages } = useOptionsSearch('usages')
+const { search: searchLaboratory, options: laboratories } = useOptionsSearch('laboratories')
 
 const availabilityOptions = [
   { id: 'available', name: 'Disponible' },
-  { id: 'out_of_stock', name: 'Agotado' },
   { id: 'low', name: 'Bajo' },
+  { id: 'out_of_stock', name: 'Agotado' },
 ]
 
-const type = ref<string | number | null>(null)
-const usage = ref<string | number | null>(null)
-const laboratory = ref<string | number | null>(null)
-const availability = ref<string | number | null>(null)
+const searchAvailability = ref('')
+
+const filters = ref<MoreFilter>({
+  type: null,
+  usage: null,
+  laboratory: null,
+  availability: null,
+})
+
+const sendFilter = () => {
+  emit('filter_availability', filters.value)
+}
+
+const clearFilters = () => {
+  filters.value = {
+    type: null,
+    usage: null,
+    laboratory: null,
+    availability: null,
+  }
+  emit('filter_availability', filters.value)
+}
 </script>
 
 <template>
@@ -22,8 +50,9 @@ const availability = ref<string | number | null>(null)
           Tipo
         </label>
         <SelectSearch
-          v-model="type"
-          :options="[]"
+          v-model="filters.type"
+          v-model:search="searchType"
+          :options="typeProducts"
           size="md"
           placeholder="Seleccione el tipo"
           search-placeholder="Buscar tipo..."
@@ -36,12 +65,13 @@ const availability = ref<string | number | null>(null)
           Uso
         </label>
         <SelectSearch
-          v-model="usage"
-          :options="[]"
+          v-model="filters.usage"
+          v-model:search="searchUsage"
+          :options="usages"
           size="md"
           placeholder="Seleccione el uso"
           search-placeholder="Buscar uso..."
-          label="name"
+          label="description"
           track-by="id"
         />
       </div>
@@ -50,8 +80,9 @@ const availability = ref<string | number | null>(null)
           Laboratorio
         </label>
         <SelectSearch
-          v-model="laboratory"
-          :options="[]"
+          v-model="filters.laboratory"
+          v-model:search="searchLaboratory"
+          :options="laboratories"
           size="md"
           placeholder="Seleccione el laboratorio"
           search-placeholder="Buscar laboratorio..."
@@ -64,7 +95,8 @@ const availability = ref<string | number | null>(null)
           Disponibilidad
         </label>
         <SelectSearch
-          v-model="availability"
+          v-model="filters.availability"
+          v-model:search="searchAvailability"
           :options="availabilityOptions"
           size="md"
           placeholder="Seleccione la disponibilidad"
@@ -74,16 +106,20 @@ const availability = ref<string | number | null>(null)
         />
       </div>
     </div>
-    <div class="flex items-center justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-800">
+    <div
+      class="flex items-center justify-end gap-3 border-t border-gray-200 pt-4 dark:border-gray-800"
+    >
       <button
         type="button"
         class="rounded-full border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-white/5"
+        @click.prevent="clearFilters"
       >
         Limpiar
       </button>
       <button
         type="button"
         class="rounded-full bg-brand-500 px-4 py-2 text-sm font-medium text-white hover:bg-brand-600"
+        @click="sendFilter"
       >
         Aplicar
       </button>

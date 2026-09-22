@@ -7,6 +7,7 @@ interface FilterSearch {
   input: string
   search: string
   page: number
+  additionalFilter?: Record<string, string | number | null>
 }
 
 interface FieldOption {
@@ -19,7 +20,8 @@ interface Props {
   fieldOptions?: FieldOption[]
   filterSearch: FilterSearch
   pagination?: Meta
-  activeMoreFilter?: boolean
+  activeMoreFilter?: boolean,
+  additionalFilter?: Record<string, string | number | null>
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -79,6 +81,7 @@ watch(debouncedSearch, (search) => {
     input: selectedField.value,
     search,
     page: newPage.value,
+    additionalFilter: props.additionalFilter,
   })
 })
 
@@ -87,6 +90,7 @@ watch([selectedField, newPage], () => {
     input: selectedField.value,
     search: search.value,
     page: newPage.value,
+    additionalFilter: props.additionalFilter,
   })
 })
 
@@ -183,17 +187,17 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 
     <div
       v-if="activeMoreFilter"
-      class="grid transition-all duration-300 ease-in-out"
+      class="relative z-30 grid transition-all duration-300 ease-in-out"
       :class="moreFilterDropdownOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'"
     >
-      <div class="overflow-hidden">
+      <div :class="moreFilterDropdownOpen ? 'overflow-visible' : 'overflow-hidden'">
         <div class="border-b border-gray-200 p-4 dark:border-gray-800 sm:p-5">
           <slot name="filters"></slot>
         </div>
       </div>
     </div>
 
-    <div class="overflow-x-auto">
+    <div class="relative z-0 overflow-x-auto">
       <table class="w-full text-left">
         <thead>
           <tr class="border-b border-gray-200 dark:border-gray-800">

@@ -8,12 +8,17 @@ import FilterTable from '@/Products/components/FilterTable.vue'
 import { FilterOption } from '@/Products/enums/FilterOption.ts'
 import { useProduct } from '@/Products/composables/useProduct.ts'
 import { ref } from 'vue'
+import type { MoreFilter } from '@/Products/types/Product.ts'
 
 const title = ref<string>('Productos')
 const columns = ref<string[]>(['Producto', 'Laboratorio', 'Tipo', 'Precio', 'Estado'])
 const optionsSearching = Object.entries(FilterOption).map(([value, label]) => ({ value, label }))
 
-const { filter, pagination, total } = useProduct()
+const { filter, pagination, total, handleSetMoreFilter } = useProduct()
+
+const handleFilter = (filters: MoreFilter) => {
+  handleSetMoreFilter(filters)
+}
 </script>
 <template>
   <div class="grid grid-cols-12 gap-4 md:gap-6">
@@ -47,11 +52,12 @@ const { filter, pagination, total } = useProduct()
         :columns="columns"
         :fieldOptions="optionsSearching"
         :activeMoreFilter="true"
+        :additionalFilter="filter.moreFilter"
         v-model:filterSearch="filter"
         v-model:pagination="pagination"
       >
         <template #filters>
-          <FilterTable />
+          <FilterTable @filter_availability="handleFilter" />
         </template>
         <template #default>
           <table-body />

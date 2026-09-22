@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
-import type { MetaOptions, ProductLists } from '@/Products/types/Product.ts'
+import type { MetaOptions, ProductLists, Filter, MoreFilter } from '@/Products/types/Product.ts'
 import { computed, ref } from 'vue'
 import type { Meta, PaginatedApiResponse } from '@/types/Response.ts'
-import type { Filter } from '@/types/StandardData.ts'
 
 export const useProductStore = defineStore('product', () => {
   const products = ref<ProductLists[]>([])
@@ -10,6 +9,12 @@ export const useProductStore = defineStore('product', () => {
     input: 'name',
     search: '',
     page: 1,
+    moreFilter: {
+      availability: null,
+      type: null,
+      usage: null,
+      laboratory: null
+    }
   })
   const options = ref<MetaOptions>({
     types: [],
@@ -39,6 +44,10 @@ export const useProductStore = defineStore('product', () => {
     options.value[key] = data
   }
 
+  const setMoreFilter = (data: MoreFilter) => {
+    filter.value.moreFilter = data
+  }
+
   return {
     products,
     pagination,
@@ -48,6 +57,7 @@ export const useProductStore = defineStore('product', () => {
     total: computed(() => pagination.value.total),
 
     setProducts,
-    setOptions
+    setOptions,
+    setMoreFilter,
   }
 })

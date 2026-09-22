@@ -23,7 +23,7 @@ export const basicApiService = <T=StandardData> (endpoint: Endpoint) => {
       },
       searchData: async (search?: string) => {
         const { data } = await farmashopApi.get<ApiResponse<T[]>>(`/api/v1/${endpoint}`, {
-          params: { search, needPagination: 0, limit: 20 },
+          params: { search, needPagination: 0, limit: 20, view: 'options' },
         })
         return data.data
       },

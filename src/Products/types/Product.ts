@@ -1,5 +1,7 @@
 import type { StandardData } from '@/types/StandardData.ts'
 
+type availabilityStock = 'available' | 'low' |'out_of_stock'
+
 export interface ProductForm{
   code: string
   name: string
@@ -25,10 +27,19 @@ export interface ProductLists{
   stock: number
 }
 
+export interface MoreFilter {
+  availability: availabilityStock | null
+  type: number | null
+  usage: number | null
+  laboratory: number | null
+}
+
 export interface Filter {
-  name: string
-  code: string
-  laboratory: string
+  input: string
+  search: string
+  page: number,
+  moreFilter: MoreFilter
+  //per_page?: number
 }
 
 export interface MetaOptions {

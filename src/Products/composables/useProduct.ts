@@ -42,7 +42,8 @@ export const useProduct = () => {
     pagination,
     filter,
     deleteProduct,
-    createProduct
+    createProduct,
+    handleSetMoreFilter: store.setMoreFilter
   }
 
 }

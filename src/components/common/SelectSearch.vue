@@ -153,7 +153,7 @@ onUnmounted(() => {
 
     <div
       v-if="isOpen"
-      class="absolute z-20 mt-2 w-full rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+      class="absolute z-50 mt-2 w-full rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
     >
       <div class="relative px-1 pt-1 pb-2">
         <AppIcon
