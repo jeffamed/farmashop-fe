@@ -3,6 +3,10 @@ import { useProductStore } from '@/Products/store/product.store.ts'
 import { storeToRefs } from 'pinia'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import { watch } from 'vue'
+import type { AxiosError } from 'axios'
+import type { ValidateErrorResponse } from '@/types/ErrorResponse.ts'
+import type { ProductForm, ProductLists } from '@/Products/types/Product.ts'
+import type { ApiResponse } from '@/types/Response.ts'
 
 
 export const useProduct = () => {
@@ -31,8 +35,13 @@ export const useProduct = () => {
     }
   })
 
-  const createProduct = useMutation({
+  const createProduct = useMutation<ApiResponse<ProductLists>, AxiosError<ValidateErrorResponse>, ProductForm>({
     mutationFn: service.saveProduct,
+    onSuccess: () => {
+      clientQuery.invalidateQueries({
+        queryKey: ['products'],
+      })
+    },
   })
 
   return{

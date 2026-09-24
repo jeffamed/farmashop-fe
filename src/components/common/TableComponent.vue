@@ -7,7 +7,7 @@ interface FilterSearch {
   input: string
   search: string
   page: number
-  additionalFilter?: Record<string, string | number | null>
+  moreFilter?: Record<string, string | number | null>
 }
 
 interface FieldOption {
@@ -20,8 +20,8 @@ interface Props {
   fieldOptions?: FieldOption[]
   filterSearch: FilterSearch
   pagination?: Meta
-  activeMoreFilter?: boolean,
-  additionalFilter?: Record<string, string | number | null>
+  activeMoreFilter?: boolean
+  moreFilter?: Record<string, string | number | null>
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -81,7 +81,7 @@ watch(debouncedSearch, (search) => {
     input: selectedField.value,
     search,
     page: newPage.value,
-    additionalFilter: props.additionalFilter,
+    moreFilter: props.moreFilter,
   })
 })
 
@@ -90,13 +90,39 @@ watch([selectedField, newPage], () => {
     input: selectedField.value,
     search: search.value,
     page: newPage.value,
-    additionalFilter: props.additionalFilter,
+    moreFilter: props.moreFilter,
   })
 })
 
-const pages = computed(() =>
-  Array.from({ length: props.pagination?.last_page ?? 1 }, (_, i) => i + 1),
-)
+const pages = computed(() => {
+  const lastPage = props.pagination?.last_page ?? 1
+  const currentPage = props.pagination?.current_page ?? 1
+  const range = 2
+
+  const pagesArray: (number | string)[] = []
+  const start = Math.max(1, currentPage - range)
+  const end = Math.min(lastPage, currentPage + range)
+
+  if (start > 1) {
+    pagesArray.push(1)
+    if (start > 2) {
+      pagesArray.push('...')
+    }
+  }
+
+  for (let i = start; i <= end; i++) {
+    pagesArray.push(i)
+  }
+
+  if (end < lastPage) {
+    if (end < lastPage - 1) {
+      pagesArray.push('...')
+    }
+    pagesArray.push(lastPage)
+  }
+
+  return pagesArray
+})
 
 const nextPage = () => {
   if (props.pagination && props.pagination.current_page < props.pagination.last_page) {
@@ -239,20 +265,24 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
           <AppIcon name="chevron-right" class="h-4 w-4 rotate-180" />
           <span class="sr-only">Anterior</span>
         </button>
-        <button
-          type="button"
-          v-for="page in pages"
-          class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
-          :key="page"
-          :class="[
-            page === props.pagination?.current_page
-              ? 'bg-brand-500 text-white'
-              : 'text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/5',
-          ]"
-          @click.prevent="newPage = page"
-        >
-          {{ page }}
-        </button>
+        <template v-for="(page, idx) in pages" :key="`${page}-${idx}`">
+          <button
+            v-if="typeof page === 'number'"
+            type="button"
+            class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium"
+            :class="[
+              page === props.pagination?.current_page
+                ? 'bg-brand-500 text-white'
+                : 'text-gray-500 hover:bg-gray-50 dark:text-gray-400 dark:hover:bg-white/5',
+            ]"
+            @click.prevent="newPage = page"
+          >
+            {{ page }}
+          </button>
+          <span v-else class="flex h-8 items-center px-2 text-gray-500 dark:text-gray-400">
+            ...
+          </span>
+        </template>
         <button
           type="button"
           class="flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-gray-500 hover:bg-gray-50 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-white/5"

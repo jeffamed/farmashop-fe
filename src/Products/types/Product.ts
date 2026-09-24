@@ -5,9 +5,10 @@ type availabilityStock = 'available' | 'low' |'out_of_stock'
 export interface ProductForm{
   code: string
   name: string
-  unit_price: number
+  price: number
   cost: number
   discount: number
+  stock: number
   supplier_id: number
   laboratory_id: number
   presentation_id: number
@@ -15,6 +16,7 @@ export interface ProductForm{
   unit_box: number
   type_id: number
   usages: number[]
+  images?: File[] | null
 }
 
 export interface ProductLists{
@@ -29,9 +31,9 @@ export interface ProductLists{
 
 export interface MoreFilter {
   availability: availabilityStock | null
-  type: number | null
-  usage: number | null
-  laboratory: number | null
+  type: number[] | null
+  usage: number[] | null
+  laboratory: number[] | null
 }
 
 export interface Filter {

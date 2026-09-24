@@ -83,6 +83,7 @@ const clearFilters = () => {
           v-model="filters.laboratory"
           v-model:search="searchLaboratory"
           :options="laboratories"
+          :multiple="true"
           size="md"
           placeholder="Seleccione el laboratorio"
           search-placeholder="Buscar laboratorio..."

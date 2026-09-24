@@ -52,7 +52,7 @@ const handleFilter = (filters: MoreFilter) => {
         :columns="columns"
         :fieldOptions="optionsSearching"
         :activeMoreFilter="true"
-        :additionalFilter="filter.moreFilter"
+        :moreFilter="filter.moreFilter"
         v-model:filterSearch="filter"
         v-model:pagination="pagination"
       >

@@ -17,11 +17,16 @@ const props = withDefaults(
     <div
       class="rounded-2xl border border-gray-200 bg-white p-6 shadow-theme-sm dark:border-gray-800 dark:bg-gray-dark"
     >
-      <h2
-        class="mb-5 text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
-      >
-        {{ props.title }}
-      </h2>
+      <div class="mb-5 flex items-center justify-between gap-4">
+        <h2
+          class="text-xs font-semibold tracking-wide text-gray-500 uppercase dark:text-gray-400"
+        >
+          {{ props.title }}
+        </h2>
+        <div>
+          <slot name="btnAction"></slot>
+        </div>
+      </div>
       <div :class="props.classBody">
         <slot></slot>
       </div>

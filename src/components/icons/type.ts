@@ -55,6 +55,7 @@ export type IconName =
   | "pie-chart"
   | "plug-in"
   | "plus"
+  | "question"
   | "refresh"
   | "search"
   | "send"

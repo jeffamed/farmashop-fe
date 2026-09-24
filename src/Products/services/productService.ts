@@ -16,7 +16,31 @@ export const productService = () => {
       return products
     },
     saveProduct: async (payload: ProductForm) => {
-      const { data } = await farmashopApi.post<ApiResponse<ProductLists>>(route, payload)
+      const formData = new FormData()
+
+      formData.append('code', payload.code)
+      formData.append('name', payload.name)
+      formData.append('price', String(payload.price))
+      formData.append('cost', String(payload.cost))
+      formData.append('discount', String(payload.discount))
+      formData.append('stock', String(payload.stock))
+      formData.append('supplier_id', String(payload.supplier_id))
+      formData.append('laboratory_id', String(payload.laboratory_id))
+      formData.append('presentation_id', String(payload.presentation_id))
+      formData.append('location_id', String(payload.location_id))
+      formData.append('unit_box', String(payload.unit_box))
+      formData.append('type_id', String(payload.type_id))
+
+      payload.usages.forEach((usageId) => {
+        formData.append('usages[]', String(usageId))
+      })
+
+      if(payload.images !== null && payload.images !== undefined && payload.images.length > 0){
+        payload.images.forEach((image) => {
+          formData.append('images[]', image)
+        })
+      }
+      const { data } = await farmashopApi.post<ApiResponse<ProductLists>>(route, formData)
       return data
     },
     deleteProduct: async (id: number) => {

@@ -91,7 +91,13 @@ function selectOption(option: SelectOption) {
     return
   }
 
-  emit('update:modelValue', value)
+  // Single select: toggle selection (deselect if already selected)
+  const isAlreadySelected = props.modelValue === value
+  if (isAlreadySelected) {
+    emit('update:modelValue', null)
+  } else {
+    emit('update:modelValue', value)
+  }
   closeDropdown()
 }
 

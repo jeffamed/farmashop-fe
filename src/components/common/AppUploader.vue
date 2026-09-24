@@ -1,119 +1,199 @@
 <script setup lang="ts">
 import Uppy from '@uppy/core'
-import XHRUpload from '@uppy/xhr-upload'
-import { UploadButton, FilesList, UppyContextProvider } from '@uppy/vue'
-import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
-import AppIcon from '@/components/icons/AppIcon.vue'
-import type { IconName } from '@/components/icons/type'
+import UppyImageEditor from '@uppy/image-editor'
+import { Dropzone, FilesList, UppyContextProvider } from '@uppy/vue'
+import { computed } from 'vue'
+import '@uppy/vue/css/style.css'
+import '@uppy/vue/css/image-editor.css'
 
 interface Props {
-  type?: 'imagen' | 'documento'
-  endpoint?: string
+  maxFiles?: number
+  maxFileSize?: number
+  allowedFileTypes?: string[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  type: 'imagen',
-  endpoint: '/api/upload',
+  maxFiles: 5,
+  maxFileSize: 5 * 1024 * 1024,
+  allowedFileTypes: () => ['image/jpeg', 'image/png', 'image/webp'],
 })
 
-let uppyInstance: Uppy | null = null
+const emit = defineEmits<{
+  filesChange: [files: File[]]
+}>()
 
-onMounted(() => {
-  uppyInstance = new Uppy({
+const uppy = computed(() =>
+  new Uppy({
     restrictions: {
-      maxNumberOfFiles: props.type === 'imagen' ? 1 : 5,
-      allowedFileTypes:
-        props.type === 'imagen'
-          ? ['image/jpeg', 'image/png', 'image/webp']
-          : [
-              'application/pdf',
-              'application/msword',
-              'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-            ],
-      maxFileSize: props.type === 'imagen' ? 5 * 1024 * 1024 : 10 * 1024 * 1024,
+      maxNumberOfFiles: props.maxFiles,
+      allowedFileTypes: props.allowedFileTypes,
+      maxFileSize: props.maxFileSize,
     },
-  })
+  }).use(UppyImageEditor),
+)
 
-  uppyInstance.use(XHRUpload, {
-    endpoint: props.endpoint,
-    fieldName: props.type === 'imagen' ? 'image' : 'documents',
-  })
-})
-
-const uppy = computed(() => uppyInstance)
-
-onBeforeUnmount(() => {
-  uppyInstance = null
-})
-
-interface Config {
-  icon: IconName
-  title: string
-  description: string
-  button: string
-  restrictions: string
+const getFiles = (): File[] => {
+  return uppy.value
+    .getFiles()
+    .map((file) => file.data)
+    .filter((file): file is File => file instanceof File)
 }
 
-const config = computed((): Config => {
-  const configs: Record<'imagen' | 'documento', Config> = {
-    imagen: {
-      icon: 'box' as const,
-      title: 'Agrega una imagen para identificar el producto',
-      description: 'Se mostrará una vista previa antes de guardar.',
-      button: 'Seleccionar imagen',
-      restrictions: 'JPG, PNG o WebP. Tamaño máximo: 5 MB.',
-    },
-    documento: {
-      icon: 'docs' as const,
-      title: 'Carga tus documentos',
-      description: 'Sube documentos importantes para el producto.',
-      button: 'Seleccionar documentos',
-      restrictions: 'PDF, DOC o DOCX. Tamaño máximo: 10 MB.',
-    },
-  }
-  return configs[props.type]
+uppy.value.on('file-added', () => {
+  emit('filesChange', getFiles())
+})
+
+uppy.value.on('file-removed', () => {
+  emit('filesChange', getFiles())
 })
 </script>
 
 <template>
-  <div v-if="uppy">
-    <UppyContextProvider :uppy="uppy">
-      <div
-        class="rounded-lg border border-gray-700 bg-gradient-to-br from-gray-900 to-gray-950 p-6"
-      >
-        <div class="flex gap-6">
-          <!-- Icono -->
-          <div class="flex-shrink-0">
-            <div
-              class="flex h-16 w-16 items-center justify-center rounded-lg border border-gray-600 bg-gray-800/50"
-            >
-              <AppIcon :name="config.icon" class="h-8 w-8 text-gray-400" />
-            </div>
-          </div>
-
-          <!-- Contenido -->
-          <div class="flex flex-1 flex-col justify-between">
-            <div>
-              <h3 class="mb-1 text-sm font-semibold text-white">{{ config.title }}</h3>
-              <p class="text-sm text-gray-400">{{ config.description }}</p>
-            </div>
-            <UploadButton>
-              <AppIcon name="download" class="h-4 w-4" />
-              {{ config.button }}
-            </UploadButton>
-          </div>
-        </div>
-
-        <!-- Restricciones -->
-        <p class="mt-4 text-xs text-gray-500">{{ config.restrictions }}</p>
+  <UppyContextProvider :uppy="uppy">
+    <div class="uploader-wrapper">
+      <div class="dropzone-container">
+        <Dropzone />
       </div>
-
-      <!-- Lista de archivos -->
-      <div v-if="uppy.getFiles().length > 0" class="mt-4">
+      <div class="files-container">
         <FilesList />
       </div>
-    </UppyContextProvider>
-  </div>
+    </div>
+  </UppyContextProvider>
 </template>
 
-<style scoped></style>
+<style>
+.uploader-wrapper {
+  display: flex !important;
+  gap: 24px !important;
+  align-items: flex-start !important;
+}
+
+.dropzone-container {
+  flex: 0 0 auto !important;
+  width: 260px !important;
+}
+
+.files-container {
+  flex: 1 !important;
+  min-width: 0 !important;
+}
+
+.uppy-Dropzone {
+  border: 2px dashed #4a5568 !important;
+  border-radius: 12px !important;
+  background-color: rgba(26, 32, 46, 0.5) !important;
+  padding: 32px 16px !important;
+  text-align: center !important;
+  transition: all 0.3s ease !important;
+  cursor: pointer !important;
+}
+
+.uppy-Dropzone:hover {
+  border-color: #6b7a99 !important;
+  background-color: rgba(26, 32, 46, 0.8) !important;
+}
+
+.uppy-Dropzone-inner {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.uppy-Dropzone-icon {
+  width: 48px !important;
+  height: 48px !important;
+  color: #7b8fc0 !important;
+}
+
+.uppy-Dropzone-title {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #e2e8f0 !important;
+  margin: 0 !important;
+}
+
+.uppy-Dropzone-hint {
+  font-size: 12px !important;
+  color: #a0aec0 !important;
+  margin: 0 !important;
+}
+
+.uppy-FileList {
+  max-height: 240px !important;
+  overflow-y: auto !important;
+  padding-right: 8px !important;
+  margin: 0 !important;
+}
+
+.uppy-FileList-item {
+  background-color: rgba(26, 32, 46, 0.7) !important;
+  border: 1px solid #4a5568 !important;
+  border-radius: 8px !important;
+  padding: 12px !important;
+  margin-bottom: 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.uppy-FileList-item-name {
+  color: #e2e8f0 !important;
+  font-size: 13px !important;
+  flex: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.uppy-FileList-item-preview {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 6px !important;
+  overflow: hidden !important;
+  flex-shrink: 0 !important;
+}
+
+.uppy-FileList-item-remove {
+  background-color: transparent !important;
+  color: #ef5350 !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-size: 11px !important;
+  flex-shrink: 0 !important;
+}
+
+.uppy-FileList-item-remove:hover {
+  background-color: rgba(239, 83, 80, 0.1) !important;
+}
+
+/* Scrollbar styling */
+.uppy-FileList::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.uppy-FileList::-webkit-scrollbar-track {
+  background: rgba(26, 32, 46, 0.3) !important;
+  border-radius: 3px !important;
+}
+
+.uppy-FileList::-webkit-scrollbar-thumb {
+  background: #4a5568 !important;
+  border-radius: 3px !important;
+}
+
+.uppy-FileList::-webkit-scrollbar-thumb:hover {
+  background: #6b7a99 !important;
+}
+
+.uppy-Modal {
+  background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+.uppy-Modal-inner {
+  background-color: #1a202e !important;
+  border-radius: 12px !important;
+}
+</style>

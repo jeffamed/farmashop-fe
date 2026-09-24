@@ -7,6 +7,11 @@ import CardContent from '@/components/common/CardContent.vue'
 import SelectSearch from '@/components/common/SelectSearch.vue'
 import { useProduct } from '@/Products/composables/useProduct.ts'
 import { useOptionsSearch } from '@/Products/composables/useOptionsSearch.ts'
+import DrawerComponent from '@/components/common/DrawerComponent.vue'
+import { push } from 'notivue'
+import type { ValidateErrorResponse } from '@/types/ErrorResponse.ts'
+import AppUploader from '@/components/common/AppUploader.vue'
+import AppTooltip from '@/components/common/AppTooltip.vue'
 
 const { createProduct } = useProduct()
 const { search: searchSupplier, options: suppliers } = useOptionsSearch('suppliers')
@@ -16,11 +21,14 @@ const { search: searchLocation, options: locations } = useOptionsSearch('locatio
 const { search: searchType, options: typeProducts } = useOptionsSearch('types')
 const { search: searchUsage, options: usages } = useOptionsSearch('usages')
 
+const errorForm = ref<ValidateErrorResponse | null>(null)
+
 const form = ref<ProductForm>({
   code: '',
   name: '',
-  unit_price: 0,
+  price: 0,
   cost: 0,
+  stock: 0,
   discount: 0,
   supplier_id: 0,
   laboratory_id: 0,
@@ -29,10 +37,28 @@ const form = ref<ProductForm>({
   unit_box: 0,
   type_id: 0,
   usages: [],
+  images: [],
 })
 
+const isDrawerOpen = ref(false)
+
 const saveProduct = () => {
-  createProduct.mutate(form.value)
+  createProduct.mutate(form.value, {
+    onSuccess: () => {
+      push.success('Producto creado correctamente')
+      router.push({ name: 'products' })
+    },
+    onError: (e) => {
+      errorForm.value = e?.response?.data ?? null
+    },
+  })
+}
+
+const errorMessage = (input: string) => {
+  const errorsValue = errorForm.value
+  if (errorsValue && errorsValue.errors) {
+    return errorsValue?.errors[input]?.toString() ?? ''
+  }
 }
 </script>
 
@@ -82,6 +108,22 @@ const saveProduct = () => {
           placeholder="Nombre del producto"
           class="block w-full rounded-full border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-none dark:border-gray-700 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-800"
         />
+        <p v-show="errorForm && errorForm.errors.name" class="text-red-500">
+          <span>{{ errorMessage('name') }}</span>
+        </p>
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <label class="mb-2.5 block text-sm font-medium text-gray-800 dark:text-white/90">
+            Imagen del producto
+          </label>
+          <AppTooltip content="Solo se permite 1 imagen" />
+        </div>
+        <AppUploader
+          @files-change="form.images = $event"
+          :max-files="1"
+          :allowed-file-types="['image/jpeg', 'image/png', 'image/webp']"
+        />
       </div>
     </CardContent>
 
@@ -92,7 +134,7 @@ const saveProduct = () => {
           Precio venta (C$) <span class="text-error-500">*</span>
         </label>
         <input
-          v-model="form.unit_price"
+          v-model="form.price"
           type="number"
           value="0"
           min="0"
@@ -125,6 +167,15 @@ const saveProduct = () => {
 
     <!-- Clasificación e inventario -->
     <CardContent title="Clasificación e inventario" classBody="">
+      <template #btnAction>
+        <button
+          class="inline-flex items-center justify-center text-white bg-brand-500 border border-transparent hover:bg-brand-600 focus:ring-4 focus:ring-brand-500/10 shadow-sm font-medium rounded-full text-sm px-4 py-2.5 focus:outline-none"
+          type="button"
+          @click="isDrawerOpen = true"
+        >
+          <AppIcon name="plus" />
+        </button>
+      </template>
       <div class="grid gap-5 sm:grid-cols-3">
         <div>
           <label class="mb-2.5 block text-sm font-medium text-gray-800 dark:text-white/90">
@@ -139,6 +190,9 @@ const saveProduct = () => {
             label="name"
             track-by="id"
           />
+          <p v-show="errorForm && errorForm.errors.supplier_id" class="text-red-500">
+            <span>{{ errorMessage('supplier_id') }}</span>
+          </p>
         </div>
         <div>
           <label class="mb-2.5 block text-sm font-medium text-gray-800 dark:text-white/90">
@@ -153,6 +207,9 @@ const saveProduct = () => {
             label="name"
             track-by="id"
           />
+          <p v-show="errorForm && errorForm.errors.laboratory_id" class="text-red-500">
+            <span>{{ errorMessage('laboratory_id') }}</span>
+          </p>
         </div>
         <div>
           <label class="mb-2.5 block text-sm font-medium text-gray-800 dark:text-white/90">
@@ -167,6 +224,9 @@ const saveProduct = () => {
             label="name"
             track-by="id"
           />
+          <p v-show="errorForm && errorForm.errors.presentation_id" class="text-red-500">
+            <span>{{ errorMessage('presentation_id') }}</span>
+          </p>
         </div>
       </div>
       <div class="mt-5 grid gap-5 sm:grid-cols-3">
@@ -175,13 +235,6 @@ const saveProduct = () => {
             <label class="block text-sm font-medium text-gray-800 dark:text-white/90">
               Ubicación
             </label>
-            <button
-              type="button"
-              class="inline-flex items-center gap-1 text-xs font-medium text-brand-500 hover:text-brand-600 dark:text-brand-400 dark:hover:text-brand-300"
-            >
-              <AppIcon name="plus" class="h-3 w-3" />
-              Nueva
-            </button>
           </div>
           <SelectSearch
             v-model="form.location_id"
@@ -192,6 +245,9 @@ const saveProduct = () => {
             label="name"
             track-by="id"
           />
+          <p v-show="errorForm && errorForm.errors.location_id" class="text-red-500">
+            <span>{{ errorMessage('location_id') }}</span>
+          </p>
         </div>
         <div>
           <label class="mb-2.5 block text-sm font-medium text-gray-800 dark:text-white/90">
@@ -206,6 +262,9 @@ const saveProduct = () => {
             label="name"
             track-by="id"
           />
+          <p v-show="errorForm && errorForm.errors.type_id" class="text-red-500">
+            <span>{{ errorMessage('type_id') }}</span>
+          </p>
         </div>
         <div>
           <label class="mb-2.5 block text-sm font-medium text-gray-800 dark:text-white/90">
@@ -218,6 +277,9 @@ const saveProduct = () => {
             min="0"
             class="block w-full rounded-full border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 focus:outline-none dark:border-gray-700 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-gray-500 dark:focus:border-brand-800"
           />
+          <p v-show="errorForm && errorForm.errors.unit_box" class="text-red-500">
+            <span>{{ errorMessage('unit_box') }}</span>
+          </p>
         </div>
       </div>
       <hr class="my-6 border-t border-gray-200 dark:border-gray-800" />
@@ -257,7 +319,10 @@ const saveProduct = () => {
         Guardar producto
       </button>
     </div>
+    <DrawerComponent :open="isDrawerOpen" @update:open="isDrawerOpen = $event" />
   </div>
 </template>
 
 <style scoped></style>
+<style src="@uppy/vue/css/style.css"></style>
+<style src="@uppy/vue/css/image-editor.css"></style>
