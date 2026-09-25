@@ -121,7 +121,9 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
             v-if="openActionsId === product.id"
             class="absolute right-0 z-10 mt-2 w-44 rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
           >
-            <slot name="rowActions" :product="product"></slot>
+            <slot name="rowActions" :product="product">
+
+            </slot>
           </div>
         </div>
       </div>
