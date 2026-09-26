@@ -12,6 +12,7 @@ import { push } from 'notivue'
 import type { ValidateErrorResponse } from '@/types/ErrorResponse.ts'
 import AppUploader from '@/components/common/AppUploader.vue'
 import AppTooltip from '@/components/common/AppTooltip.vue'
+import DrawerForm from '@/Products/components/DrawerForm.vue'
 
 const { createProduct } = useProduct()
 const { search: searchSupplier, options: suppliers } = useOptionsSearch('suppliers')
@@ -300,7 +301,7 @@ const errorMessage = (input: string) => {
         />
       </div>
     </CardContent>
-
+    <p v-if="errorForm && !errorForm.hasOwnProperty('errors')"><small>{{ errorForm.message }}</small></p>
     <!-- Acciones -->
     <div class="col-span-12 flex items-center justify-end gap-3">
       <button
@@ -319,7 +320,11 @@ const errorMessage = (input: string) => {
         Guardar producto
       </button>
     </div>
-    <DrawerComponent :open="isDrawerOpen" @update:open="isDrawerOpen = $event" />
+    <DrawerComponent :open="isDrawerOpen" @update:open="isDrawerOpen = $event" title="Crear registro">
+      <template #default>
+        <DrawerForm />
+      </template>
+    </DrawerComponent>
   </div>
 </template>
 

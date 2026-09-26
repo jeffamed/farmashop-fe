@@ -1,7 +1,12 @@
 import { computed, ref, watch } from 'vue'
-import { basicApiService, type Endpoint } from '@/services/basicApiService.ts'
+import {
+  basicApiService,
+  type Endpoint,
+  type Payload,
+  type PayloadUsage,
+} from '@/services/basicApiService.ts'
 import { useDebouncedRef } from '@/utils/composables/useDebounceRef.ts'
-import { useQuery } from '@tanstack/vue-query'
+import { useMutation, useQuery } from '@tanstack/vue-query'
 import { useProductStore } from '@/Products/store/product.store.ts'
 import { storeToRefs } from 'pinia'
 
@@ -22,7 +27,7 @@ export const useOptionsSearch = (option: Endpoint) => {
       store.setOptions(option, optionValue)
     }
   })
-
+  
   return {
     search,
     options: computed(() => options.value[option]),

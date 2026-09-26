@@ -17,6 +17,7 @@ import Login from '@/views/Login.vue'
 import { useAuthStore } from '@/stores/auth.store.ts'
 import ProductCreate from '@/Products/pages/ProductCreate.vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
+import ProductDetail from '@/Products/pages/ProductDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,6 +44,12 @@ const router = createRouter({
           path: '/product/create',
           name: 'product.create',
           component: ProductCreate,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: '/product/:id',
+          name: 'product.detail',
+          component: ProductDetail,
           meta: { requiresAuth: true },
         },
         {

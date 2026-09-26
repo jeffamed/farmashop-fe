@@ -119,10 +119,20 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
           </button>
           <div
             v-if="openActionsId === product.id"
-            class="absolute right-0 z-10 mt-2 w-44 rounded-xl border border-gray-200 bg-white p-1.5 shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
+            class="absolute right-0 z-10 mt-2 w-32 rounded-lg border border-gray-200 bg-white shadow-theme-lg dark:border-gray-800 dark:bg-gray-dark"
           >
             <slot name="rowActions" :product="product">
-
+              <router-link
+                :to="{ name: 'product.detail', params: { id: product.id } }"
+                class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5 first:rounded-t-md"
+              >
+                <AppIcon name="eye" class="h-4 w-4 flex-shrink-0" />
+                <span>Ver</span>
+              </router-link>
+              <div class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5 last:rounded-b-md">
+                <AppIcon name="table" class="h-4 w-4 flex-shrink-0" />
+                <span>Ir a Kardex</span>
+              </div>
             </slot>
           </div>
         </div>

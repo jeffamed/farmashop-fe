@@ -3,11 +3,18 @@ import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
 import { useDebouncedRef } from '@/utils/composables/useDebounceRef'
 import type { Meta } from '@/types/Response.ts'
+type FilterValue =
+  | string
+  | number
+  | boolean
+  | string[]
+  | number[]
+  | null
 interface FilterSearch {
   input: string
   search: string
   page: number
-  moreFilter?: Record<string, string | number | null>
+  moreFilter?: Record<string, FilterValue>
 }
 
 interface FieldOption {
@@ -21,7 +28,7 @@ interface Props {
   filterSearch: FilterSearch
   pagination?: Meta
   activeMoreFilter?: boolean
-  moreFilter?: Record<string, string | number | null>
+  moreFilter?: Record<string, FilterValue>
 }
 
 const props = withDefaults(defineProps<Props>(), {
