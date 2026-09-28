@@ -48,6 +48,7 @@ export const productService = () => {
       const { data } = await farmashopApi.post<ApiResponse<ProductLists>>(route, formData)
       return data
     },
+
     deleteProduct: async (id: number) => {
       await farmashopApi.delete(`${route}/${id}`)
     },

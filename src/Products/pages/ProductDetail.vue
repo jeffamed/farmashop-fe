@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import AppIcon from '@/components/icons/AppIcon.vue'
 import BreadcrumbsComponent from '@/components/layout/BreadcrumbsComponent.vue'
+import ProductDetailSkeleton from '@/Products/components/ProductDetailSkeleton.vue'
 import { useProduct } from '@/Products/composables/useProduct.ts'
 
 const { productDetail } = useProduct()
@@ -8,9 +9,7 @@ const { data: product } = productDetail
 </script>
 
 <template>
-  <div v-if="productDetail.isPending.value">
-    <h3>Cargando...</h3>
-  </div>
+  <ProductDetailSkeleton v-if="productDetail.isPending.value" />
 
   <div v-else-if="product" class="grid grid-cols-12 gap-4 md:gap-6">
     <!-- Header -->

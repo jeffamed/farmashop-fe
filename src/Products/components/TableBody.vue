@@ -67,7 +67,9 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
     :key="product.id"
   >
     <td class="whitespace-nowrap px-5 py-4 sm:px-6">
-      <p class="font-medium text-gray-800 dark:text-white/90">{{ product.name }}</p>
+      <router-link :to="{ name: 'product.detail', params: { id: product.id } }">
+        <p class="font-medium text-gray-800 dark:text-white/90">{{ product.name }}</p>
+      </router-link>
       <p class="text-xs text-gray-400 dark:text-gray-500">{{ product.code }}</p>
     </td>
     <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">

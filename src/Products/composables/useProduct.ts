@@ -17,7 +17,8 @@ export const useProduct = () => {
   const clientQuery = useQueryClient()
   const route = useRoute()
   const productId = computed(() => Number(route.params.id))
-
+  const routeName = computed(() => route.name)
+  console.info(routeName.value)
 
   const productsData = useQuery({
     queryKey: ['products', filter],
@@ -33,6 +34,9 @@ export const useProduct = () => {
   const productDetail = useQuery({
     queryKey: ['product', productId],
     queryFn: () => service.getProduct(productId.value),
+    enabled: !!productId.value && routeName.value === 'product.detail',
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: true,
   })
 
   const deleteProduct = useMutation({
