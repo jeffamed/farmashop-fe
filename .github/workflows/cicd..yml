@@ -1,5 +1,23 @@
 name: CI/CD Farmashop Frontend
-on: [push, pull_request]
+on: [ push, pull_request, workflow_dispatch ]
 jobs:
-  build:
+  testing:
     runs-on: ubuntu-latest
+    steps:
+      - name: Get the source project
+        uses: actions/checkout@v7
+
+      - name: Get Node version
+        uses: actions/setup-node@v7
+        with:
+          node-version: '22'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm run test:unit
+
+      - name: Run Test Lint
+        if: always()
+        run: npm run lint

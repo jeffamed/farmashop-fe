@@ -1,9 +1,8 @@
 import { useRouteApiRef } from '@/utils/composables/useRouteApiRef.ts'
 import { farmashopApi } from '@/api/axios.ts'
 import type { ApiResponse, PaginatedApiResponse } from '@/types/Response.ts'
-import type { ProductForm, ProductLists } from '@/Products/types/Product.ts'
+import type { ProductDetails, ProductForm, ProductLists } from '@/Products/types/Product.ts'
 import type { Filter } from '@/types/StandardData.ts'
-import type { Payload, PayloadUsage } from '@/services/basicApiService.ts'
 
 export const productService = () => {
   const route = useRouteApiRef('products')
@@ -15,6 +14,12 @@ export const productService = () => {
       )
       return products
     },
+
+    getProduct: async (id: number) => {
+      const { data: product } = await farmashopApi.get<ProductDetails>(`${route}/${id}`)
+      return product
+    },
+
     saveProduct: async (payload: ProductForm) => {
       const formData = new FormData()
 

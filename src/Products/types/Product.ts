@@ -2,7 +2,7 @@ import type { StandardData } from '@/types/StandardData.ts'
 
 type availabilityStock = 'available' | 'low' |'out_of_stock'
 
-export interface ProductForm{
+export interface ProductForm {
   code: string
   name: string
   price: number
@@ -54,3 +54,23 @@ export interface MetaOptions {
   //suppliers: Record<string, string | number>[]
 }
 
+
+export interface ProductDetails {
+  id: number
+  code: string
+  name: string
+  unit_price: number
+  cost: number
+  discount: number
+  stock: number
+  supplier_id: number
+  laboratory_id: number
+  presentation_id: number
+  presentation: string
+  location_id: number
+  unit_box: number
+  type_id: number
+  type: string
+  usages: number[]
+  image: string
+}

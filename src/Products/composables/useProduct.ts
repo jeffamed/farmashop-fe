@@ -2,11 +2,12 @@ import { productService } from '@/Products/services/productService.ts'
 import { useProductStore } from '@/Products/store/product.store.ts'
 import { storeToRefs } from 'pinia'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import { watch } from 'vue'
+import { computed, watch } from 'vue'
 import type { AxiosError } from 'axios'
 import type { ValidateErrorResponse } from '@/types/ErrorResponse.ts'
 import type { ProductForm, ProductLists } from '@/Products/types/Product.ts'
 import type { ApiResponse } from '@/types/Response.ts'
+import { useRoute } from 'vue-router'
 
 
 export const useProduct = () => {
@@ -14,6 +15,9 @@ export const useProduct = () => {
   const store = useProductStore()
   const { products, pagination,  filter, total } = storeToRefs(store)
   const clientQuery = useQueryClient()
+  const route = useRoute()
+  const productId = computed(() => Number(route.params.id))
+
 
   const productsData = useQuery({
     queryKey: ['products', filter],
@@ -24,6 +28,11 @@ export const useProduct = () => {
     if (data){
       store.setProducts(data)
     }
+  })
+
+  const productDetail = useQuery({
+    queryKey: ['product', productId],
+    queryFn: () => service.getProduct(productId.value),
   })
 
   const deleteProduct = useMutation({
@@ -52,7 +61,8 @@ export const useProduct = () => {
     filter,
     deleteProduct,
     createProduct,
-    handleSetMoreFilter: store.setMoreFilter
+    productDetail,
+    handleSetMoreFilter: store.setMoreFilter,
   }
 
 }
