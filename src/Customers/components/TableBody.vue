@@ -4,7 +4,7 @@ import AppIcon from '@/components/icons/AppIcon.vue'
 import { useCustomer } from '@/Customers/composables/useCustomer.ts'
 import DeleteModal from '@/components/common/Modals/DeleteModal.vue'
 import EditFormModal from '@/Customers/components/EditFormModal.vue'
-import type { Customer, CustomerData } from '@/Customers/types/Customer.ts'
+import type { CustomerData } from '@/Customers/types/Customer.ts'
 import { push } from 'notivue'
 
 const { customers, deleteCustomer } = useCustomer()

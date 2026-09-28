@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import PageHeader from '@/components/layout/PageHeader.vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
-import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
+import BreadcrumbsComponent from '@/components/layout/BreadcrumbsComponent.vue'
 import RegisterNameModal from '@/components/common/RegisterNameModal.vue'
 import { useTypeProduct } from '../composables/useTypeProduct'
 import SimpleCard from '@/components/common/SimpleCard.vue'
@@ -72,7 +72,7 @@ const removeTypeProduct = (type_product_id: number|string) => {
 <template>
   <div class="grid grid-cols-12 gap-4 md:gap-6">
     <div class="col-span-12">
-      <Breadcrumbs
+      <BreadcrumbsComponent
         :parent-path="{ name: 'Almacén', root: '/type-products' }"
         :current-path="{ name: title, root: '/type-products' }"
       />

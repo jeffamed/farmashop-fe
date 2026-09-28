@@ -2,7 +2,7 @@
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import PageHeader from '@/components/layout/PageHeader.vue'
 import AppIcon from '@/components/icons/AppIcon.vue'
-import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
+import BreadcrumbsComponent from '@/components/layout/BreadcrumbsComponent.vue'
 import { ref } from 'vue'
 const title = ref<string>('Usuarios')
 </script>
@@ -10,7 +10,7 @@ const title = ref<string>('Usuarios')
   <admin-layout>
     <div class="grid grid-cols-12 gap-4 md:gap-6">
       <div class="col-span-12">
-        <Breadcrumbs
+        <BreadcrumbsComponent
           :parent-path="{ name: 'Acceso', root: '/users' }"
           :current-path="{ name: title, root: '/users' }"
         />

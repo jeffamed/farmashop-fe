@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import AppIcon from '@/components/icons/AppIcon.vue'
-import Breadcrumbs from '@/components/layout/Breadcrumbs.vue'
+import BreadcrumbsComponent from '@/components/layout/BreadcrumbsComponent.vue'
 import { useProduct } from '@/Products/composables/useProduct.ts'
 
 const { productDetail } = useProduct()
@@ -15,7 +15,7 @@ const { data: product } = productDetail
   <div v-else-if="product" class="grid grid-cols-12 gap-4 md:gap-6">
     <!-- Header -->
     <div class="col-span-12">
-      <Breadcrumbs
+      <BreadcrumbsComponent
         :parent-path="{ name: 'Productos', root: '/products' }"
         :current-path="{ name: 'Detalle del producto', root: '/products' }"
       />
@@ -51,7 +51,7 @@ const { data: product } = productDetail
           <div
             class="border border-gray-200 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50 flex items-center gap-3"
           >
-            <AppIcon name="price-tag" :size="24" class="opacity-70" />
+            <AppIcon name="currency-dollar-circle" :size="24" class="opacity-70" />
             <div>
               <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Venta</div>
               <div class="text-xl font-bold text-gray-800 dark:text-white/90">
@@ -108,7 +108,7 @@ const { data: product } = productDetail
           <div
             class="border border-gray-200 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50"
           >
-            <AppIcon name="price-tag" :size="24" class="mb-3 opacity-60" />
+            <AppIcon name="currency-dollar-circle" :size="24" class="opacity-70" />
             <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">
               Precio de venta
             </div>
@@ -119,7 +119,7 @@ const { data: product } = productDetail
           <div
             class="border border-gray-200 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50"
           >
-            <AppIcon name="price-tag" :size="24" class="mb-3 opacity-60" />
+            <AppIcon name="currency-dollar-circle" :size="24" class="opacity-70" />
             <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">
               Precio de compra
             </div>
@@ -130,7 +130,7 @@ const { data: product } = productDetail
           <div
             class="border border-gray-200 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50"
           >
-            <AppIcon name="presentation" :size="24" class="mb-3 opacity-60" />
+            <AppIcon name="layer-three-one" :size="24" class="mb-3 opacity-60" />
             <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">
               Presentación
             </div>
@@ -154,16 +154,20 @@ const { data: product } = productDetail
             <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">
               Ubicación
             </div>
-            <div class="text-lg font-semibold text-gray-800 dark:text-white/90">Estante A1</div>
+            <div class="text-lg font-semibold text-gray-800 dark:text-white/90">
+              {{ product.location }}
+            </div>
           </div>
           <div
             class="border border-gray-200 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50"
           >
-            <AppIcon name="pill" :size="24" class="mb-3 opacity-60" />
+            <AppIcon name="box" :size="24" class="mb-3 opacity-60" />
             <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">
               Tipo
             </div>
-            <div class="text-lg font-semibold text-gray-800 dark:text-white/90">Genérico</div>
+            <div class="text-lg font-semibold text-gray-800 dark:text-white/90">
+              {{ product.type }}
+            </div>
           </div>
           <div
             class="border border-gray-200 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50"
@@ -172,16 +176,20 @@ const { data: product } = productDetail
             <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">
               Unidades por caja
             </div>
-            <div class="text-lg font-semibold text-gray-800 dark:text-white/90">20</div>
+            <div class="text-lg font-semibold text-gray-800 dark:text-white/90">
+              {{ product.unit_box }}
+            </div>
           </div>
           <div
             class="border border-gray-200 dark:border-gray-800 rounded-lg p-4 bg-gray-50 dark:bg-gray-900/50"
           >
-            <AppIcon name="gift" :size="24" class="mb-3 opacity-60" />
+            <AppIcon name="percent-3" :size="24" class="mb-3 opacity-60" />
             <div class="text-xs text-gray-500 dark:text-gray-400 uppercase tracking-widest mb-2">
               Descuento
             </div>
-            <div class="text-lg font-semibold text-gray-800 dark:text-white/90">0%</div>
+            <div class="text-lg font-semibold text-gray-800 dark:text-white/90">
+              {{ product.discount }}%
+            </div>
           </div>
         </div>
 
@@ -215,25 +223,29 @@ const { data: product } = productDetail
             <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-1">
               R.U.C.
             </div>
-            <div class="text-gray-900 dark:text-white font-medium">J03100001234567</div>
+            <div class="text-gray-900 dark:text-white font-medium">{{ product.supplier.ruc }}</div>
           </div>
           <div>
             <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-1">
               NOMBRE
             </div>
-            <div class="text-gray-900 dark:text-white font-medium">Distribuidora Central</div>
+            <div class="text-gray-900 dark:text-white font-medium">{{ product.supplier.name }}</div>
           </div>
           <div>
             <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-1">
               TELÉFONO
             </div>
-            <div class="text-gray-900 dark:text-white font-medium">+505 2255 0140</div>
+            <div class="text-gray-900 dark:text-white font-medium">
+              {{ product.supplier.telephone }}
+            </div>
           </div>
           <div>
             <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-1">
               DIRECCIÓN
             </div>
-            <div class="text-gray-900 dark:text-white font-medium">Reparto San Juan, Managua</div>
+            <div class="text-gray-900 dark:text-white font-medium">
+              {{ product.supplier.address }}
+            </div>
           </div>
         </div>
       </div>
@@ -241,7 +253,7 @@ const { data: product } = productDetail
       <div
         class="border border-gray-200 dark:border-gray-800 rounded-2xl p-6 bg-white dark:bg-gray-dark"
       >
-        <AppIcon name="building" :size="24" class="mb-4 opacity-70" />
+        <AppIcon name="building-two" :size="24" class="mb-4 opacity-70" />
         <h3 class="text-xl font-bold text-gray-900 dark:text-white/90 mb-4">
           Información del laboratorio
         </h3>
@@ -250,14 +262,16 @@ const { data: product } = productDetail
             <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-1">
               NOMBRE
             </div>
-            <div class="text-gray-900 dark:text-white font-medium">Lab Génesis</div>
+            <div class="text-gray-900 dark:text-white font-medium">
+              {{ product.laboratory.name }}
+            </div>
           </div>
           <div>
             <div class="text-xs text-gray-600 dark:text-gray-400 uppercase tracking-widest mb-1">
               DIRECCIÓN
             </div>
             <div class="text-gray-900 dark:text-white font-medium">
-              Km 8.5 Carretera Norte, Managua
+              {{ product.laboratory.address }}
             </div>
           </div>
         </div>
@@ -266,16 +280,14 @@ const { data: product } = productDetail
       <div
         class="lg:col-span-2 border border-gray-200 dark:border-gray-800 rounded-2xl p-6 bg-white dark:bg-gray-dark"
       >
-        <AppIcon name="task" :size="24" class="mb-4 opacity-70" />
+        <AppIcon name="clipboard" :size="24" class="mb-4 opacity-70" />
         <h3 class="text-xl font-bold text-gray-900 dark:text-white/90 mb-4">Usos del producto</h3>
         <div class="flex gap-4">
           <span
             class="px-4 py-2 rounded-lg bg-indigo-100 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 font-semibold"
-            >Dolor</span
-          >
-          <span
-            class="px-4 py-2 rounded-lg bg-indigo-100 dark:bg-indigo-500/15 text-indigo-700 dark:text-indigo-400 font-semibold"
-            >Fiebre</span
+            v-for="(usage, idx) in product.usages"
+            :key="idx"
+            >{{ usage }}</span
           >
         </div>
       </div>

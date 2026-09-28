@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import type { filterLaboratory, Laboratory } from '@/Laboratories/types/Laboratory.ts'
-import type { Link, Meta, PaginatedApiResponse } from '@/types/Response.ts'
+import type { Meta, PaginatedApiResponse } from '@/types/Response.ts'
 
 export const useLaboratoryStore = defineStore('laboratory', () => {
   const laboratories = ref<Laboratory[]>([])

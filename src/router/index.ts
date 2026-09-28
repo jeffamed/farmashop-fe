@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Dashboard from '@/views/Dashboard.vue'
+import DashboardView from '@/views/DashboardView.vue'
 import ProductList from '@/Products/pages/ProductList.vue'
 import LocationPage from '@/Locations/pages/LocationPage.vue'
 import TypeProductPage from '@/TypeProducts/pages/TypeProductPage.vue'
@@ -13,7 +13,7 @@ import SalePage from '@/Sales/pages/SalePage.vue'
 import CustomerPage from '@/Customers/pages/CustomerPage.vue'
 import UserPage from '@/Users/pages/UserPage.vue'
 import RolePage from '@/Roles/pages/RolePage.vue'
-import Login from '@/views/Login.vue'
+import LoginView from '@/views/LoginView.vue'
 import { useAuthStore } from '@/stores/auth.store.ts'
 import ProductCreate from '@/Products/pages/ProductCreate.vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
@@ -30,7 +30,7 @@ const router = createRouter({
         {
           path: '',
           name: 'home',
-          component: Dashboard,
+          component: DashboardView,
           meta: { requiresAuth: true },
         },
         // Almacen
@@ -138,7 +138,7 @@ const router = createRouter({
     {
       path: '/login',
       name: 'login',
-      component: Login,
+      component: LoginView,
     },
   ],
 })

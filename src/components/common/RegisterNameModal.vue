@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Payload } from '@/services/basicApiService'
 import ModalGlobal from '@/components/common/ModalGlobal.vue'
-import AppIcon from '@/components/icons/AppIcon.vue'
 import { ref, watch } from 'vue'
 
 interface Props {

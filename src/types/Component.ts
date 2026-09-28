@@ -1,5 +1,5 @@
 export type OptionValue = string | number
-export type SelectOption = Record<string, any>
+export type SelectOption = Record<string, OptionValue>
 export type SelectSize = 'sm' | 'md' | 'lg'
 
 export interface SearchSelectProp {

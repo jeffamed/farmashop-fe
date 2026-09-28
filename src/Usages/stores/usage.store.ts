@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import type { StandardData } from '@/types/StandardData.ts'
 export interface Usage {
   id: number
   description: string

@@ -327,7 +327,6 @@ const startTransition = (el: HTMLElement) => {
   el.style.height = 'auto'
   const height = el.scrollHeight
   el.style.height = '0px'
-  el.offsetHeight // force reflow
   el.style.height = height + 'px'
 }
 

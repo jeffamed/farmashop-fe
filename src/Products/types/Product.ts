@@ -54,6 +54,17 @@ export interface MetaOptions {
   //suppliers: Record<string, string | number>[]
 }
 
+interface Laboratory {
+  name: string
+  address: string
+}
+
+interface Supplier {
+  ruc: string,
+  name: string
+  address: string,
+  telephone: string
+}
 
 export interface ProductDetails {
   id: number
@@ -63,14 +74,12 @@ export interface ProductDetails {
   cost: number
   discount: number
   stock: number
-  supplier_id: number
-  laboratory_id: number
-  presentation_id: number
   presentation: string
-  location_id: number
   unit_box: number
-  type_id: number
   type: string
-  usages: number[]
-  image: string
+  usages: string[]
+  image: string,
+  location: string
+  laboratory: Laboratory
+  supplier: Supplier
 }

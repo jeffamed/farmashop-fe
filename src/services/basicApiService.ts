@@ -1,7 +1,6 @@
 import { farmashopApi } from '@/api/axios.ts'
 import type { ApiResponse } from '@/types/Response.ts'
 import type { StandardData } from '@/types/StandardData.ts'
-import type { Usage } from '@/Usages/stores/usage.store.ts'
 
 export type Endpoint = 'locations' | 'usages' | 'presentations' | 'types' | 'suppliers' | 'laboratories'
 
