@@ -3,8 +3,12 @@ import AppIcon from '@/components/icons/AppIcon.vue'
 import BreadcrumbsComponent from '@/components/layout/BreadcrumbsComponent.vue'
 import ProductDetailSkeleton from '@/Products/components/ProductDetailSkeleton.vue'
 import { useProduct } from '@/Products/composables/useProduct.ts'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
-const { productDetail } = useProduct()
+const { productDetail, prefethEdit } = useProduct()
+const route = useRoute()
+const productId = computed(() => Number(route.params.id))
 const { data: product } = productDetail
 </script>
 
@@ -27,11 +31,13 @@ const { data: product } = productDetail
             Información completa para revisar inventario, precios y origen.
           </p>
         </div>
-        <button
+        <router-link
+          @mouseover="prefethEdit(productId)"
+          :to="{ name: 'product.edit', params: { id: product.id } }"
           class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-3 rounded-full font-semibold flex items-center gap-2"
         >
           <AppIcon name="edit" :size="20" /> Editar producto
-        </button>
+        </router-link>
       </div>
     </div>
 

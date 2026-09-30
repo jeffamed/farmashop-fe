@@ -7,7 +7,7 @@ import DeleteModal from '@/components/common/Modals/DeleteModal.vue'
 import type { ProductLists } from '@/Products/types/Product.ts'
 import { push } from 'notivue'
 
-const { products, deleteProduct } = useProduct()
+const { products, deleteProduct, prefethEdit, handleActiveProduct } = useProduct()
 
 const openActionsId = ref<number | string | null>(null)
 const actionsMenuRef = ref<HTMLElement | null>(null)
@@ -15,6 +15,7 @@ const actionsMenuRef = ref<HTMLElement | null>(null)
 const showDeleteModal = ref(false)
 const product = ref<ProductLists>({
   id: 0,
+  active: true,
   name: '',
   code: '',
   laboratory: '',
@@ -56,6 +57,18 @@ const handleDelete = (deleteRegister: boolean) => {
   showDeleteModal.value = false
 }
 
+const handleActive = (id: number, active: boolean) => {
+  handleActiveProduct.mutate(
+    { id, active },
+    {
+      onSuccess: () => {
+        const textActive = active ? 'habilitado' : 'deshabilitado'
+        push.success(`Producto ${textActive} correctamente`)
+      },
+    },
+  )
+}
+
 onMounted(() => document.addEventListener('click', handleClickOutside))
 onUnmounted(() => document.removeEventListener('click', handleClickOutside))
 </script>
@@ -71,6 +84,11 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
         <p class="font-medium text-gray-800 dark:text-white/90">{{ product.name }}</p>
       </router-link>
       <p class="text-xs text-gray-400 dark:text-gray-500">{{ product.code }}</p>
+      <span
+        class="inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium bg-gray-400 text-gray-700 dark:bg-gray-500/15 dark:text-gray-500"
+        v-show="!product.active"
+        >Deshabilitado</span
+      >
     </td>
     <td class="whitespace-nowrap px-5 py-4 text-sm text-gray-500 dark:text-gray-400 sm:px-6">
       {{ product.laboratory }}
@@ -88,13 +106,14 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
     </td>
     <td class="whitespace-nowrap px-5 py-4 sm:px-6">
       <div class="flex items-center justify-end gap-1">
-        <button
-          type="button"
+        <router-link
+          @mouseenter="prefethEdit(product.id)"
+          :to="{ name: 'product.edit', params: { id: product.id } }"
           class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
         >
           <AppIcon name="edit" class="h-4 w-4" />
           <span class="sr-only">Editar</span>
-        </button>
+        </router-link>
         <button
           type="button"
           class="flex h-8 w-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-700 dark:hover:bg-white/5 dark:hover:text-gray-300"
@@ -131,10 +150,28 @@ onUnmounted(() => document.removeEventListener('click', handleClickOutside))
                 <AppIcon name="eye" class="h-4 w-4 flex-shrink-0" />
                 <span>Ver</span>
               </router-link>
-              <div class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5 last:rounded-b-md">
+              <div
+                class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5 last:rounded-b-md"
+              >
                 <AppIcon name="table" class="h-4 w-4 flex-shrink-0" />
                 <span>Ir a Kardex</span>
               </div>
+              <button
+                v-if="product.active"
+                class="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5 last:rounded-b-md text-red-500"
+                @click.prevent="handleActive(product.id, false)"
+              >
+                <AppIcon name="close" class="h-4 w-4 flex-shrink-0" />
+                <span>Deshabilitar</span>
+              </button>
+              <button
+                v-else
+                @click.prevent="handleActive(product.id, true)"
+                class="flex items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-white/5 last:rounded-b-md"
+              >
+                <AppIcon name="check" class="h-4 w-4 flex-shrink-0" />
+                <span>Habilitar</span>
+              </button>
             </slot>
           </div>
         </div>

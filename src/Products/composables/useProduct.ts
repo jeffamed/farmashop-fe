@@ -1,7 +1,7 @@
 import { productService } from '@/Products/services/productService.ts'
 import { useProductStore } from '@/Products/store/product.store.ts'
 import { storeToRefs } from 'pinia'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQuery, useQueryClient, noop } from '@tanstack/vue-query'
 import { computed, watch } from 'vue'
 import type { AxiosError } from 'axios'
 import type { ValidateErrorResponse } from '@/types/ErrorResponse.ts'
@@ -18,7 +18,6 @@ export const useProduct = () => {
   const route = useRoute()
   const productId = computed(() => Number(route.params.id))
   const routeName = computed(() => route.name)
-  console.info(routeName.value)
 
   const productsData = useQuery({
     queryKey: ['products', filter],
@@ -39,6 +38,12 @@ export const useProduct = () => {
     refetchOnWindowFocus: true,
   })
 
+  const productDataEdit = useQuery({
+    queryKey: ['product-edit', productId],
+    queryFn: () => service.editProduct(productId.value),
+    enabled: !!productId.value && routeName.value === 'product.edit',
+  })
+
   const deleteProduct = useMutation({
     mutationFn: service.deleteProduct,
     onSuccess: () => {
@@ -57,7 +62,36 @@ export const useProduct = () => {
     },
   })
 
-  return{
+  const updateProduct = useMutation<ApiResponse<ProductLists>, AxiosError<ValidateErrorResponse>, ProductForm>({
+    mutationFn: (payload) => service.updateProduct(productId.value, payload),
+    onSuccess: () => {
+      clientQuery.invalidateQueries({
+        queryKey: ['products'],
+      })
+      clientQuery.invalidateQueries({
+        queryKey: ['product-edit', productId],
+      })
+    },
+  })
+
+  const prefethEdit = async (id: number) => {
+    await clientQuery
+      .query({
+        queryKey: ['product-edit', id],
+        queryFn: () => service.editProduct(id),
+      })
+  }
+
+  const handleActiveProduct = useMutation({
+    mutationFn: (payload: { id: number, active: boolean }) =>  service.activeProduct(payload.id, payload.active),
+    onSuccess: () => {
+      clientQuery.invalidateQueries({
+        queryKey: ['products'],
+      })
+    }
+  })
+
+  return {
     productsData,
     products,
     total,
@@ -66,7 +100,11 @@ export const useProduct = () => {
     deleteProduct,
     createProduct,
     productDetail,
+    productDataEdit,
+    updateProduct,
+    prefethEdit,
     handleSetMoreFilter: store.setMoreFilter,
+    handleActiveProduct,
   }
 
 }

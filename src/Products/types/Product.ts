@@ -27,6 +27,7 @@ export interface ProductLists{
   type: string
   unit_price: number
   stock: number
+  active: boolean
 }
 
 export interface MoreFilter {
@@ -82,4 +83,21 @@ export interface ProductDetails {
   location: string
   laboratory: Laboratory
   supplier: Supplier
+}
+
+export interface ProductEdit {
+  id: number
+  code: string
+  name: string
+  unit_price: number
+  cost: number
+  discount: number
+  presentation_id: number
+  unit_box: number
+  type_id: number
+  usages: number[]
+  image_current: string
+  location_id: number
+  laboratory_id: number
+  supplier_id: number
 }
