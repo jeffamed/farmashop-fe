@@ -84,3 +84,4 @@ export type IconName =
   | 'current-dollar'
   | 'building-two'
   | 'clipboard'
+  | 'shopping-cart'

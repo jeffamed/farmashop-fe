@@ -60,7 +60,7 @@ export const productService = () => {
       return data
     },
 
-    updateProduct: async (id:number, payload: ProductForm) => {
+    updateProduct: async (id: number, payload: ProductForm) => {
       const formData = new FormData()
       formData.append('_method', 'PUT')
       formData.append('code', payload.code)
@@ -85,7 +85,10 @@ export const productService = () => {
           formData.append('images[]', image)
         })
       }
-      const { data } = await farmashopApi.post<ApiResponse<ProductLists>>(`${route}/${id}`, formData)
+      const { data } = await farmashopApi.post<ApiResponse<ProductLists>>(
+        `${route}/${id}`,
+        formData,
+      )
       return data
     },
 

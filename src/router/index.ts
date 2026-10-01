@@ -19,6 +19,8 @@ import ProductCreate from '@/Products/pages/ProductCreate.vue'
 import AdminLayout from '@/components/layout/AdminLayout.vue'
 import ProductDetail from '@/Products/pages/ProductDetail.vue'
 import ProductEdit from '@/Products/pages/ProductEdit.vue'
+import OrderCreate from '@/Orders/pages/OrderCreate.vue'
+import OrderDetail from '@/Orders/pages/OrderDetail.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -94,6 +96,18 @@ const router = createRouter({
           path: '/orders',
           name: 'orders',
           component: OrderPage,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: '/order/create',
+          name: 'order.create',
+          component: OrderCreate,
+          meta: { requiresAuth: true },
+        },
+        {
+          path: '/order/:id',
+          name: 'order.detail',
+          component: OrderDetail,
           meta: { requiresAuth: true },
         },
         {

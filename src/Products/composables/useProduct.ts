@@ -25,7 +25,7 @@ export const useProduct = () => {
   })
 
   watch(productsData.data, (data) => {
-    if (data){
+    if (data) {
       store.setProducts(data)
     }
   })
@@ -79,7 +79,7 @@ export const useProduct = () => {
       .query({
         queryKey: ['product-edit', id],
         queryFn: () => service.editProduct(id),
-      })
+      }).catch(noop)
   }
 
   const handleActiveProduct = useMutation({
