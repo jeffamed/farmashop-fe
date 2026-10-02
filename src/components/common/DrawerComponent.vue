@@ -5,7 +5,14 @@ import AppIcon from '@/components/icons/AppIcon.vue'
 const props = defineProps<{
   open?: boolean
   title: string
+  description?: string
+  size?: 'small' | 'medium'
 }>()
+
+const sizeClasses = {
+  small: 'w-80',
+  medium: 'w-120',
+}
 
 const emit = defineEmits<{
   'update:open': [value: boolean]
@@ -38,7 +45,7 @@ const handleBackdropClick = (e: MouseEvent) => {
   <!-- drawer component -->
   <div
     v-show="isOpen || open"
-    class="fixed top-16 right-0 z-40 h-[calc(100vh-4rem)] p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-800 w-80 border-l border-gray-200 dark:border-gray-700"
+    :class="['fixed top-16 right-0 z-40 h-[calc(100vh-4rem)] p-4 overflow-y-auto transition-transform bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700', sizeClasses[props.size ?? 'small']]"
     tabindex="-1"
     aria-labelledby="drawer-contact-label"
   >
@@ -55,6 +62,7 @@ const handleBackdropClick = (e: MouseEvent) => {
         <span class="sr-only">Close menu</span>
       </button>
     </div>
+    <p v-if="description !== ''" class="text-sm text-gray-500 dark:text-gray-400">{{ description }}</p>
     <div>
       <slot></slot>
     </div>

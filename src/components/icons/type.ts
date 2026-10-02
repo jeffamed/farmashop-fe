@@ -85,3 +85,4 @@ export type IconName =
   | 'building-two'
   | 'clipboard'
   | 'shopping-cart'
+  | 'phone'

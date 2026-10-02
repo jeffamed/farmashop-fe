@@ -27,6 +27,7 @@ const isOpen = ref(false)
 const searchInput = ref('')
 const rootRef = ref<HTMLElement | null>(null)
 const searchInputRef = ref<HTMLInputElement | null>(null)
+const highlightedIndex = ref(-1)
 
 const selectedValues = computed<OptionValue[]>(() => {
   if (props.multiple) return Array.isArray(props.modelValue) ? props.modelValue : []
@@ -119,11 +120,35 @@ function handleClickOutside(event: MouseEvent) {
 function handleKeydown(event: KeyboardEvent) {
   if (event.key === 'Escape') {
     closeDropdown()
+    return
+  }
+
+  if (!isOpen.value) return
+
+  if (event.key === 'ArrowDown') {
+    event.preventDefault()
+    highlightedIndex.value = Math.min(highlightedIndex.value + 1, filteredOptions.value.length - 1)
+  } else if (event.key === 'ArrowUp') {
+    event.preventDefault()
+    highlightedIndex.value = Math.max(highlightedIndex.value - 1, -1)
+  } else if (event.key === 'Enter') {
+    event.preventDefault()
+    if (highlightedIndex.value >= 0 && filteredOptions.value[highlightedIndex.value]) {
+      selectOption(filteredOptions.value[highlightedIndex.value])
+      highlightedIndex.value = -1
+    }
   }
 }
 
 watch(searchInput, (search) => {
   emit('update:search', search)
+  highlightedIndex.value = -1
+})
+
+watch(isOpen, (open) => {
+  if (!open) {
+    highlightedIndex.value = -1
+  }
 })
 
 onMounted(() => {
@@ -178,7 +203,7 @@ onUnmounted(() => {
         />
       </div>
       <ul class="max-h-60 overflow-y-auto">
-        <li v-for="option in filteredOptions" :key="option[trackBy]">
+        <li v-for="(option, index) in filteredOptions" :key="option[trackBy]">
           <button
             type="button"
             class="flex w-full items-center justify-between gap-2 rounded-lg text-left font-medium transition"
@@ -186,9 +211,12 @@ onUnmounted(() => {
               sizeClasses.option,
               isSelected(option)
                 ? 'bg-brand-50 text-brand-500 dark:bg-brand-500/[0.12] dark:text-brand-400'
-                : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5',
+                : highlightedIndex === index
+                  ? 'bg-gray-100 text-gray-700 dark:bg-white/10 dark:text-gray-300'
+                  : 'text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-white/5',
             ]"
             @click="selectOption(option)"
+            @mouseenter="highlightedIndex = index"
           >
             <span class="truncate">{{ option[label] }}</span>
             <span

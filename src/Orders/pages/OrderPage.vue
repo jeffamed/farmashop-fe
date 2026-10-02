@@ -11,8 +11,7 @@ const title = ref<string>('Órdenes de compra')
 const columns = ref<string[]>(['Código', 'Proveedor', 'Subtotal', 'IVA', 'Total', 'Fecha'])
 
 enum SearchOptions {
-  code = 'Código',
-  user = 'Usuario',
+  code = 'Código/Factura',
   supplier = 'Proveedor',
 }
 
