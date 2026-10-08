@@ -8,9 +8,9 @@ import ProductSearchDrawer from '@/Orders/components/ProductSearchDrawer.vue'
 import type { orderDetails, OrderForm } from '@/Orders/types/Order.ts'
 import type { SelectedProductCard } from '@/Products/types/Product.ts'
 import ItemOrder from '@/Orders/components/ItemOrder.vue'
-import { useOptionsSearch } from '@/Products/composables/useOptionsSearch.ts'
+import { useSuppliers } from '@/Orders/composables/useSuppliers.ts'
 
-const { search: searchSupplier, options: suppliers } = useOptionsSearch('suppliers')
+const { search: searchSupplier, suppliers } = useSuppliers()
 const isDrawerOpen = ref(false)
 const errorForm = ref({
   details: '',
@@ -63,20 +63,35 @@ const handleProductSelected = (product: SelectedProductCard) => {
     product_id: product.id,
     stock: product.stock,
     discount: product.discount,
-    unit_price: product.unit_box,
+    unit_price: product.purchase_price,
     quantity: product.quantity,
     expiration_date: product.expiration_date,
   }
   additionalData.value.current_price_product = product.unit_price
   isDrawerOpen.value = false
 }
+const pushDetail = (item: Omit<orderDetails, 'total'>) => {
+  const total = item.quantity * item.unit_price * (1 - item.discount / 100)
+  // product_id is the row key, so adding the same product again replaces its row
+  details.value = details.value.filter((row) => row.product_id !== item.product_id)
+  details.value.push({ ...item, total })
+}
+const handleProductAdded = (product: SelectedProductCard) => {
+  pushDetail({
+    product_id: product.id,
+    product_code: product.code,
+    product_name: product.name,
+    quantity: product.quantity,
+    unit_price: product.purchase_price,
+    suggest_price: 0,
+    expire_at: product.expiration_date,
+    discount: product.discount,
+  })
+}
 const addProductToOrder = () => {
   if (validateForm()) return
   const productOrder = { ...form.value }
-  const total =
-    productOrder.quantity * productOrder.unit_price -
-    (productOrder.quantity * productOrder.unit_price * productOrder.discount) / 100
-  details.value.push({
+  pushDetail({
     product_id: productOrder.product_id,
     product_code: productOrder.product_code,
     product_name: productOrder.product_name,
@@ -85,7 +100,6 @@ const addProductToOrder = () => {
     suggest_price: productOrder.suggest_price,
     expire_at: productOrder.expiration_date,
     discount: productOrder.discount,
-    total,
   })
   resetForm()
 }
@@ -142,6 +156,12 @@ const handleSubmit = () => {
 }
 const validateOrder = () => {
   let orderCompleted = true
+
+  if (form.value.invoice_number === '') {
+    orderCompleted = false
+    errorForm.value.order = 'Debe ingresar un número de factura'
+  }
+
   if (form.value.supplier_id == null) {
     orderCompleted = false
     errorForm.value.order = 'Debe seleccionar un proveedor'
@@ -524,7 +544,10 @@ const deleteItem = (productId: number) => {
       size="medium"
     >
       <template #default>
-        <ProductSearchDrawer @selected:product="handleProductSelected" />
+        <ProductSearchDrawer
+          @selected:product="handleProductSelected"
+          @add:product="handleProductAdded"
+        />
       </template>
     </DrawerComponent>
   </div>

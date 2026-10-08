@@ -118,6 +118,7 @@ export interface ProductSearch {
 
 export interface SelectedProductCard extends ProductSearch {
   quantity: number
+  purchase_price: number
   discount: number
   expiration_date: string
 }

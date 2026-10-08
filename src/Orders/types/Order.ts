@@ -9,6 +9,14 @@ export interface OrderList {
   created: string
 }
 
+// type alias (no interface) so it is assignable to SelectOption (Record<string, OptionValue>)
+export type OrderSupplier = {
+  id: number
+  name: string
+  address: string
+  phone: string
+}
+
 export interface OrderForm {
   invoice_number: string
   supplier_id: number|null

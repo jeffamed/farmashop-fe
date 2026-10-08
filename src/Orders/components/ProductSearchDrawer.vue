@@ -6,7 +6,10 @@ import { useOrder } from '@/Orders/composables/useOrder.ts'
 import type { SelectedProductCard } from '@/Products/types/Product.ts'
 
 const { search_product, productsData } = useOrder()
-const emit = defineEmits<{'selected:product': [product: SelectedProductCard]}>()
+const emit = defineEmits<{
+  'selected:product': [product: SelectedProductCard]
+  'add:product': [product: SelectedProductCard]
+}>()
 const products = computed(() => productsData.data.value)
 const getProductSelected = (product: SelectedProductCard) => {
   emit('selected:product', product)
@@ -34,7 +37,11 @@ const getProductSelected = (product: SelectedProductCard) => {
     <div v-if="products">
       <!-- Product Cards -->
       <div class="space-y-3" v-for="product in products" :key="product.id">
-        <ProductCard :product="product" @selected:product="getProductSelected" />
+        <ProductCard
+          :product="product"
+          @selected:product="getProductSelected"
+          @add:product="(selected) => emit('add:product', selected)"
+        />
       </div>
     </div>
   </div>

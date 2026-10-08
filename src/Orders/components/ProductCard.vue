@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import AppIcon from '@/components/icons/AppIcon.vue'
 import type { ProductSearch, SelectedProductCard } from '@/Products/types/Product.ts'
-import { reactive, ref } from 'vue'
+import { computed, reactive } from 'vue'
 
 interface Form {
   quantity: number
+  purchase_price: number
   discount: number
   expiration_date: string
 }
@@ -15,10 +16,12 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   'selected:product': [product: SelectedProductCard]
+  'add:product': [product: SelectedProductCard]
 }>()
 
 const form = reactive<Form>({
   quantity: 1,
+  purchase_price: props.product.cost ?? 0,
   discount: 0,
   expiration_date: '',
 })
@@ -32,6 +35,14 @@ const getStockColor = (quantity: number) => {
 const stockColor = getStockColor(props.product.stock)
 const loadProduct = () => {
   emit('selected:product', {...props.product, ...form})
+}
+const canAdd = computed(
+  () => form.expiration_date !== '' && form.quantity > 0 && form.purchase_price >= 0 &&
+    form.discount >= 0 && form.discount <= 100,
+)
+const addProduct = () => {
+  if (!canAdd.value) return
+  emit('add:product', {...props.product, ...form})
 }
 </script>
 
@@ -92,7 +103,7 @@ const loadProduct = () => {
     </div>
 
     <!-- Bottom Section with Controls -->
-    <div class="grid grid-cols-3 gap-3 items-end">
+    <div class="grid grid-cols-2 gap-3 items-end">
       <!-- Expiration Date -->
       <div>
         <label
@@ -124,6 +135,22 @@ const loadProduct = () => {
         />
       </div>
 
+      <!-- Purchase price -->
+      <div>
+        <label
+          class="text-xs font-semibold tracking-wide text-gray-500 dark:text-gray-400 uppercase mb-2 block"
+        >
+          Precio compra
+        </label>
+        <input
+          type="number"
+          v-model.number="form.purchase_price"
+          min="0"
+          step="0.01"
+          class="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/5 px-2.5 py-2 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+        />
+      </div>
+
       <!-- Discount -->
       <div>
         <label
@@ -151,7 +178,9 @@ const loadProduct = () => {
         Cargar
       </button>
       <button
-        class="w-full mt-4 rounded-full bg-blue-600 hover:bg-blue-700 px-4 py-2.5 text-center font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 inline-flex items-center justify-center gap-2"
+        :disabled="!canAdd"
+        class="w-full mt-4 rounded-full bg-blue-600 hover:bg-blue-700 px-4 py-2.5 text-center font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 inline-flex items-center justify-center gap-2 disabled:cursor-not-allowed disabled:opacity-50"
+        @click.prevent="addProduct"
       >
         <AppIcon name="plus" class="h-4 w-4" />
         Agregar
