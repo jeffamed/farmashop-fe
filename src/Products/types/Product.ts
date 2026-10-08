@@ -101,3 +101,23 @@ export interface ProductEdit {
   laboratory_id: number
   supplier_id: number
 }
+
+export interface ProductSearch {
+  id: number
+  code: string
+  name: string
+  image: string
+  presentation: string
+  stock: number
+  unit_price: number
+  cost: number
+  unit_box: number
+  cost_prev: number
+}
+
+
+export interface SelectedProductCard extends ProductSearch {
+  quantity: number
+  discount: number
+  expiration_date: string
+}

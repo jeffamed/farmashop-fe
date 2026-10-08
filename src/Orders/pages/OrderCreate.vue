@@ -2,31 +2,160 @@
 import AppIcon from '@/components/icons/AppIcon.vue'
 import SelectSearch from '@/components/common/SelectSearch.vue'
 import router from '@/router'
-import { ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import DrawerComponent from '@/components/common/DrawerComponent.vue'
 import ProductSearchDrawer from '@/Orders/components/ProductSearchDrawer.vue'
+import type { orderDetails, OrderForm } from '@/Orders/types/Order.ts'
+import type { SelectedProductCard } from '@/Products/types/Product.ts'
+import ItemOrder from '@/Orders/components/ItemOrder.vue'
+import { useOptionsSearch } from '@/Products/composables/useOptionsSearch.ts'
 
+const { search: searchSupplier, options: suppliers } = useOptionsSearch('suppliers')
 const isDrawerOpen = ref(false)
-const form = ref({
+const errorForm = ref({
+  details: '',
+  order: '',
+})
+const form = ref<OrderForm>({
   invoice_number: '',
   supplier_id: null,
-  phone: '',
-  address: '',
+  product_id: null,
   product_code: '',
   product_name: '',
   stock: 0,
   expiration_date: '',
   quantity: 0,
-  purchase_price: 0,
-  sale_price: 0,
+  suggest_price: 0,
+  unit_price: 0,
   discount: 0,
+  tax: false,
+})
+const details = ref<orderDetails[]>([])
+const additionalData = ref({
+  current_price_product: 0,
+  supplier_address: '',
+  supplier_phone: '',
 })
 
-const suppliers = ref([
-  { id: 1, name: 'Distribuidora Central' },
-  { id: 2, name: 'Farmacéutica Nacional' },
-  { id: 3, name: 'Proveedora Global' },
-])
+const totalBeforeTax = computed(() => {
+  return details.value.reduce((total, item) => total + item.total, 0)
+})
+const totalOrder = computed(() => {
+  let tax = 0
+  const total = totalBeforeTax.value
+  if (form.value.tax) {
+    tax = total * 0.15
+  }
+  return total + tax
+})
+
+watch(() => form.value.supplier_id, (supplierId) => {
+  const supplier = suppliers.value.find((supplier) => supplier.id === supplierId)
+  additionalData.value.supplier_address = supplier?.address || ''
+  additionalData.value.supplier_phone = supplier?.phone || ''
+})
+
+const handleProductSelected = (product: SelectedProductCard) => {
+  form.value = {
+    ...form.value,
+    product_code: product.code,
+    product_name: product.name,
+    product_id: product.id,
+    stock: product.stock,
+    discount: product.discount,
+    unit_price: product.unit_box,
+    quantity: product.quantity,
+    expiration_date: product.expiration_date,
+  }
+  additionalData.value.current_price_product = product.unit_price
+  isDrawerOpen.value = false
+}
+const addProductToOrder = () => {
+  if (validateForm()) return
+  const productOrder = { ...form.value }
+  const total =
+    productOrder.quantity * productOrder.unit_price -
+    (productOrder.quantity * productOrder.unit_price * productOrder.discount) / 100
+  details.value.push({
+    product_id: productOrder.product_id,
+    product_code: productOrder.product_code,
+    product_name: productOrder.product_name,
+    quantity: productOrder.quantity,
+    unit_price: productOrder.unit_price,
+    suggest_price: productOrder.suggest_price,
+    expire_at: productOrder.expiration_date,
+    discount: productOrder.discount,
+    total,
+  })
+  resetForm()
+}
+const validateForm = (): boolean => {
+  let hasError = false
+  errorForm.value.details = ''
+  const formValue = { ...form.value }
+
+  if (formValue.product_id === null) {
+    hasError = true
+    errorForm.value.details = 'Debe seleccionar o buscar un producto'
+    return hasError
+  }
+
+  if (formValue.expiration_date === '') {
+    hasError = true
+    errorForm.value.details = 'La fecha de vencimiento no puede estar vacía'
+    return hasError
+  }
+
+  if (formValue.quantity <= 0) {
+    hasError = true
+    errorForm.value.details = 'La cantidad no puede ser 0'
+    return hasError
+  }
+
+  if (formValue.discount < 0 || formValue.discount > 100) {
+    hasError = true
+    errorForm.value.details = 'El descuento debe ser entre 0 y 100'
+    return hasError
+  }
+
+  return hasError
+}
+const resetForm = () => {
+  form.value = {
+    invoice_number: '',
+    supplier_id: null,
+    product_id: null,
+    product_code: '',
+    product_name: '',
+    stock: 0,
+    expiration_date: '',
+    quantity: 0,
+    suggest_price: 0,
+    unit_price: 0,
+    discount: 0,
+    tax: false,
+  }
+}
+const handleSubmit = () => {
+  if (!validateOrder()) return
+  console.log('Formulario válido, proceder a guardar')
+}
+const validateOrder = () => {
+  let orderCompleted = true
+  if (form.value.supplier_id == null) {
+    orderCompleted = false
+    errorForm.value.order = 'Debe seleccionar un proveedor'
+  }
+
+  if (details.value.length === 0) {
+    orderCompleted = false
+    errorForm.value.details = 'Debe agregar al menos un producto'
+  }
+  return orderCompleted
+}
+const deleteItem = (productId: number) => {
+  details.value = details.value.filter((item) => item.product_id !== productId)
+}
 </script>
 
 <template>
@@ -89,11 +218,12 @@ const suppliers = ref([
             </label>
             <SelectSearch
               v-model="form.supplier_id"
+              v-model:search="searchSupplier"
               :options="suppliers"
+              placeholder="Seleccione el proveedor"
+              search-placeholder="Buscar proveedor..."
               label="name"
               track-by="id"
-              placeholder="Seleccione el proveedor"
-              size="md"
             />
           </div>
 
@@ -102,8 +232,8 @@ const suppliers = ref([
               >Teléfono</label
             >
             <input
-              v-model="form.phone"
               type="text"
+              :value="additionalData.supplier_phone"
               disabled
               placeholder="Teléfono del proveedor"
               class="w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/5 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
@@ -115,9 +245,9 @@ const suppliers = ref([
               >Dirección</label
             >
             <input
-              v-model="form.address"
               type="text"
               disabled
+              :value="additionalData.supplier_address"
               placeholder="Dirección del proveedor"
               class="w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/5 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
@@ -205,7 +335,7 @@ const suppliers = ref([
             <input
               v-model="form.expiration_date"
               type="date"
-              class="w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/5 px-4 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
+              class="native-date-picker w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/5 px-4 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
           </div>
 
@@ -228,7 +358,7 @@ const suppliers = ref([
               Precio compra (C$) <span class="text-red-500">*</span>
             </label>
             <input
-              v-model="form.purchase_price"
+              v-model="form.unit_price"
               type="number"
               placeholder="8.5"
               step="0.01"
@@ -238,15 +368,18 @@ const suppliers = ref([
 
           <div>
             <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2"
-              >Precio venta (C$)</label
+              >Precio venta sugerido(C$)</label
             >
             <input
-              v-model="form.sale_price"
+              v-model="form.suggest_price"
               type="number"
               placeholder="12.5"
-              step="0.01"
+              step="1"
               class="w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/5 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
+            <p v-show="additionalData.current_price_product > 0">
+              <small>Precio actual: C${{ additionalData.current_price_product }}</small>
+            </p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-900 dark:text-white mb-2"
@@ -256,14 +389,19 @@ const suppliers = ref([
               v-model="form.discount"
               type="number"
               placeholder="0"
-              step="0.01"
+              min="0"
+              max="100"
+              step="1"
               class="w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/5 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
           </div>
         </div>
-
+        <p v-show="errorForm.details !== ''" class="text-red-500 font-medium">
+          {{ errorForm.details }}
+        </p>
         <button
           class="w-full rounded-full bg-brand-500 hover:bg-brand-600 px-4 py-2.5 text-center font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500 inline-flex items-center justify-center gap-2"
+          @click.prevent="addProductToOrder"
         >
           <AppIcon name="plus" class="h-4 w-4" />
           Agregar a la compra
@@ -278,7 +416,7 @@ const suppliers = ref([
           Productos agregados
         </h2>
         <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
-          1 productos preparados en esta compra
+          {{ details.length }} productos preparados en esta compra
         </p>
 
         <div class="overflow-x-auto">
@@ -295,7 +433,7 @@ const suppliers = ref([
                   CANTIDAD
                 </th>
                 <th class="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-300">
-                  PRECIO
+                  PRECIO COMPRA
                 </th>
                 <th class="px-3 py-2 text-right font-medium text-gray-700 dark:text-gray-300">
                   TOTAL
@@ -304,27 +442,18 @@ const suppliers = ref([
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
-              <tr class="hover:bg-white/5 dark:hover:bg-white/10">
-                <td class="px-3 py-3">
-                  <div class="font-medium text-gray-900 dark:text-white">Loratadina 10mg</div>
-                  <div class="text-xs text-gray-500 dark:text-gray-400">
-                    PRD-1045 · Caja · 10 tabletas
-                  </div>
-                </td>
-                <td class="px-3 py-3 text-gray-600 dark:text-gray-400">2027-10-30</td>
-                <td class="px-3 py-3 text-center text-gray-600 dark:text-gray-400">8</td>
-                <td class="px-3 py-3 text-right text-gray-600 dark:text-gray-400">C$ 12.25</td>
-                <td class="px-3 py-3 text-right font-medium text-gray-900 dark:text-white">
-                  C$ 98.00
-                </td>
-                <td class="px-3 py-3 text-center">
-                  <button
-                    class="text-red-500 hover:text-red-700 dark:hover:text-red-400 focus:outline-none"
-                  >
-                    <AppIcon name="trash" class="h-4 w-4" />
-                  </button>
-                </td>
-              </tr>
+              <template v-if="details.length > 0">
+                <template v-for="item in details" :key="item.product_id">
+                  <item-order :product="item" @deleteProduct="deleteItem" />
+                </template>
+              </template>
+              <template v-else>
+                <tr>
+                  <td colspan="5" class="px-3 py-2 text-center text-gray-600 dark:text-gray-400">
+                    No hay productos en el carrito
+                  </td>
+                </tr>
+              </template>
             </tbody>
           </table>
         </div>
@@ -341,31 +470,39 @@ const suppliers = ref([
           <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Resumen de compra</h3>
         </div>
 
-        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">1 productos</p>
+        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">{{ details.length }} productos</p>
 
         <div class="space-y-3 mb-6 pb-6 border-b border-gray-200 dark:border-gray-700">
           <div class="flex justify-between text-sm">
             <span class="text-gray-600 dark:text-gray-400">Subtotal</span>
-            <span class="font-medium text-gray-900 dark:text-white">C$ 98.00</span>
+            <span class="font-medium text-gray-900 dark:text-white"
+              >C$ {{ totalBeforeTax ?? 0 }}</span
+            >
           </div>
-          <div class="flex justify-between text-sm">
+          <div class="flex justify-between text-sm" v-if="false">
             <span class="text-gray-600 dark:text-gray-400">Descuentos</span>
             <span class="font-medium text-green-600 dark:text-green-400">C$ 0.00</span>
           </div>
           <div class="flex justify-between text-sm">
-            <span class="text-gray-600 dark:text-gray-400">Impuestos</span>
-            <span class="font-medium text-gray-900 dark:text-white">C$ 0.00</span>
+            <div class="flex items-center gap-1">
+              <input type="checkbox" name="iva" id="iva" v-model="form.tax" />
+              <label for="iva" class="text-gray-600 dark:text-gray-400">Impuestos</label>
+            </div>
+            <span class="font-medium text-gray-900 dark:text-white">{{ form.tax ? 15 : 0 }} %</span>
           </div>
         </div>
 
         <div class="flex justify-between items-center mb-6">
           <span class="text-base font-semibold text-gray-900 dark:text-white">Total</span>
-          <span class="text-2xl font-bold text-blue-600 dark:text-blue-400">C$ 98.00</span>
+          <span class="text-2xl font-bold text-blue-600 dark:text-blue-400"
+            >C$ {{ totalOrder ?? 0 }}</span
+          >
         </div>
-
+        <p class="text-red-500">{{ errorForm.order }}</p>
         <div class="space-y-2">
           <button
             class="w-full rounded-full bg-brand-500 hover:bg-brand-600 px-5 py-2.5 text-center font-medium text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            @click.prevent="handleSubmit"
           >
             Guardar compra
           </button>
@@ -387,10 +524,17 @@ const suppliers = ref([
       size="medium"
     >
       <template #default>
-        <ProductSearchDrawer />
+        <ProductSearchDrawer @selected:product="handleProductSelected" />
       </template>
     </DrawerComponent>
   </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+.native-date-picker::-webkit-calendar-picker-indicator {
+  display: block !important;
+  -webkit-appearance: auto !important;
+  opacity: 1 !important;
+  cursor: pointer;
+}
+</style>

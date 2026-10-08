@@ -6,6 +6,7 @@ import type {
   ProductEdit,
   ProductForm,
   ProductLists,
+  ProductSearch,
 } from '@/Products/types/Product.ts'
 import type { Filter } from '@/types/StandardData.ts'
 
@@ -99,5 +100,10 @@ export const productService = () => {
     activeProduct: async (id: number, active: boolean) => {
       await farmashopApi.patch(`${route_secondary}/${id}/active`, { active })
     },
+
+    searchProducts: async (search: string) => {
+      const { data: products } = await farmashopApi.get<ApiResponse<ProductSearch[]>>(`${route}/search`, {params: {search}})
+      return products.data
+    }
   }
 }
