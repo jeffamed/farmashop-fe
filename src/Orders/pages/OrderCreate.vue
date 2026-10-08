@@ -9,8 +9,11 @@ import type { orderDetails, OrderForm } from '@/Orders/types/Order.ts'
 import type { SelectedProductCard } from '@/Products/types/Product.ts'
 import ItemOrder from '@/Orders/components/ItemOrder.vue'
 import { useSuppliers } from '@/Orders/composables/useSuppliers.ts'
+import { useProduct } from '@/Orders/composables/useProduct.ts'
+import { push } from 'notivue'
 
 const { search: searchSupplier, suppliers } = useSuppliers()
+const { search: searchProduct, product } = useProduct()
 const isDrawerOpen = ref(false)
 const errorForm = ref({
   details: '',
@@ -19,7 +22,10 @@ const errorForm = ref({
 const form = ref<OrderForm>({
   invoice_number: '',
   supplier_id: null,
-  product_id: null,
+  tax: false,
+})
+const formProduct = ref({
+  product_id: 0,
   product_code: '',
   product_name: '',
   stock: 0,
@@ -28,7 +34,6 @@ const form = ref<OrderForm>({
   suggest_price: 0,
   unit_price: 0,
   discount: 0,
-  tax: false,
 })
 const details = ref<orderDetails[]>([])
 const additionalData = ref({
@@ -49,30 +54,48 @@ const totalOrder = computed(() => {
   return total + tax
 })
 
-watch(() => form.value.supplier_id, (supplierId) => {
-  const supplier = suppliers.value.find((supplier) => supplier.id === supplierId)
-  additionalData.value.supplier_address = supplier?.address || ''
-  additionalData.value.supplier_phone = supplier?.phone || ''
+watch(
+  () => form.value.supplier_id,
+  (supplierId) => {
+    const supplier = suppliers.value.find((supplier) => supplier.id === supplierId)
+    additionalData.value.supplier_address = supplier?.address || ''
+    additionalData.value.supplier_phone = supplier?.phone || ''
+  },
+)
+watch(product, (item) => {
+  if (item !== null) {
+    const data = {
+      ...item,
+      expiration_date: '',
+      purchase_price: 0,
+      quantity: 1,
+      discount: 0,
+    }
+    handleProductSelected(data)
+  } else {
+    resetForm()
+    formProduct.value.product_code = searchProduct.value
+    push.error('No se encontro el producto, verifique el codigo')
+  }
 })
 
 const handleProductSelected = (product: SelectedProductCard) => {
-  form.value = {
-    ...form.value,
+  formProduct.value = {
+    product_id: product.id,
     product_code: product.code,
     product_name: product.name,
-    product_id: product.id,
     stock: product.stock,
-    discount: product.discount,
+    suggest_price: 0,
+    expiration_date: product.expiration_date,
     unit_price: product.purchase_price,
     quantity: product.quantity,
-    expiration_date: product.expiration_date,
+    discount: product.discount,
   }
   additionalData.value.current_price_product = product.unit_price
   isDrawerOpen.value = false
 }
 const pushDetail = (item: Omit<orderDetails, 'total'>) => {
   const total = item.quantity * item.unit_price * (1 - item.discount / 100)
-  // product_id is the row key, so adding the same product again replaces its row
   details.value = details.value.filter((row) => row.product_id !== item.product_id)
   details.value.push({ ...item, total })
 }
@@ -90,7 +113,7 @@ const handleProductAdded = (product: SelectedProductCard) => {
 }
 const addProductToOrder = () => {
   if (validateForm()) return
-  const productOrder = { ...form.value }
+  const productOrder = { ...formProduct.value }
   pushDetail({
     product_id: productOrder.product_id,
     product_code: productOrder.product_code,
@@ -106,7 +129,7 @@ const addProductToOrder = () => {
 const validateForm = (): boolean => {
   let hasError = false
   errorForm.value.details = ''
-  const formValue = { ...form.value }
+  const formValue = { ...formProduct.value }
 
   if (formValue.product_id === null) {
     hasError = true
@@ -135,10 +158,8 @@ const validateForm = (): boolean => {
   return hasError
 }
 const resetForm = () => {
-  form.value = {
-    invoice_number: '',
-    supplier_id: null,
-    product_id: null,
+  formProduct.value = {
+    product_id: 0,
     product_code: '',
     product_name: '',
     stock: 0,
@@ -147,7 +168,6 @@ const resetForm = () => {
     suggest_price: 0,
     unit_price: 0,
     discount: 0,
-    tax: false,
   }
 }
 const handleSubmit = () => {
@@ -175,6 +195,9 @@ const validateOrder = () => {
 }
 const deleteItem = (productId: number) => {
   details.value = details.value.filter((item) => item.product_id !== productId)
+}
+const handleValue = () => {
+  searchProduct.value = formProduct.value.product_code
 }
 </script>
 
@@ -311,9 +334,10 @@ const deleteItem = (productId: number) => {
               >Código</label
             >
             <input
-              v-model="form.product_code"
+              v-model="formProduct.product_code"
+              @keyup.enter="handleValue"
               type="text"
-              placeholder="PRD-1042"
+              placeholder="PRD-1042 + Enter"
               class="w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/5 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
           </div>
@@ -323,7 +347,7 @@ const deleteItem = (productId: number) => {
               >Producto</label
             >
             <input
-              v-model="form.product_name"
+              v-model="formProduct.product_name"
               disabled
               type="text"
               placeholder="Acetaminofén 500mg · Caja · 20 tabletas"
@@ -336,7 +360,7 @@ const deleteItem = (productId: number) => {
               >Stock actual</label
             >
             <input
-              v-model="form.stock"
+              v-model="formProduct.stock"
               disabled
               type="text"
               placeholder="240"
@@ -353,7 +377,7 @@ const deleteItem = (productId: number) => {
               Fecha de vencimiento <span class="text-red-500">*</span>
             </label>
             <input
-              v-model="form.expiration_date"
+              v-model="formProduct.expiration_date"
               type="date"
               class="native-date-picker w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/5 px-4 py-2.5 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
             />
@@ -364,7 +388,7 @@ const deleteItem = (productId: number) => {
               Cantidad comprada <span class="text-red-500">*</span>
             </label>
             <input
-              v-model="form.quantity"
+              v-model="formProduct.quantity"
               type="number"
               placeholder="12"
               class="w-full rounded-full border border-gray-300 dark:border-gray-700 bg-white dark:bg-white/5 px-4 py-2.5 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
@@ -378,7 +402,7 @@ const deleteItem = (productId: number) => {
               Precio compra (C$) <span class="text-red-500">*</span>
             </label>
             <input
-              v-model="form.unit_price"
+              v-model="formProduct.unit_price"
               type="number"
               placeholder="8.5"
               step="0.01"
@@ -391,7 +415,7 @@ const deleteItem = (productId: number) => {
               >Precio venta sugerido(C$)</label
             >
             <input
-              v-model="form.suggest_price"
+              v-model="formProduct.suggest_price"
               type="number"
               placeholder="12.5"
               step="1"
@@ -406,7 +430,7 @@ const deleteItem = (productId: number) => {
               >Descuento (%)</label
             >
             <input
-              v-model="form.discount"
+              v-model="formProduct.discount"
               type="number"
               placeholder="0"
               min="0"

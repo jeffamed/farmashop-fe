@@ -104,6 +104,11 @@ export const productService = () => {
     searchProducts: async (search: string) => {
       const { data: products } = await farmashopApi.get<ApiResponse<ProductSearch[]>>(`${route}/search`, {params: {search}})
       return products.data
+    },
+
+    searchProductByCode: async (search: string) => {
+      const { data: product } = await farmashopApi.get<ApiResponse<ProductSearch>>(`${route_secondary}/search-code`, {params: {search}})
+      return product.data
     }
   }
 }

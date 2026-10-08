@@ -20,7 +20,7 @@ export type OrderSupplier = {
 export interface OrderForm {
   invoice_number: string
   supplier_id: number|null
-  product_id: number|null
+  /*product_id: number|null
   product_code: string
   product_name: string
   stock: number
@@ -28,7 +28,7 @@ export interface OrderForm {
   quantity: number
   suggest_price: number
   unit_price: number
-  discount: number
+  discount: number*/
   tax: boolean
 }
 
