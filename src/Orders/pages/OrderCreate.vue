@@ -11,9 +11,11 @@ import ItemOrder from '@/Orders/components/ItemOrder.vue'
 import { useSuppliers } from '@/Orders/composables/useSuppliers.ts'
 import { useProduct } from '@/Orders/composables/useProduct.ts'
 import { push } from 'notivue'
+import { useOrder } from '@/Orders/composables/useOrder.ts'
 
 const { search: searchSupplier, suppliers } = useSuppliers()
 const { search: searchProduct, product } = useProduct()
+const { createOrder } = useOrder()
 const isDrawerOpen = ref(false)
 const errorForm = ref({
   details: '',
@@ -23,6 +25,8 @@ const form = ref<OrderForm>({
   invoice_number: '',
   supplier_id: null,
   tax: false,
+  subtotal: 0,
+  total: 0,
 })
 const formProduct = ref({
   product_id: 0,
@@ -172,7 +176,14 @@ const resetForm = () => {
 }
 const handleSubmit = () => {
   if (!validateOrder()) return
-  console.log('Formulario válido, proceder a guardar')
+  form.value.subtotal = totalBeforeTax.value
+  form.value.total = totalOrder.value
+  createOrder.mutate({ order: form.value, details: details.value }, {
+    onSuccess: () => {
+      push.success('Orden creada exitosamente')
+      resetForm()
+    }
+  })
 }
 const validateOrder = () => {
   let orderCompleted = true

@@ -20,6 +20,8 @@ export type OrderSupplier = {
 export interface OrderForm {
   invoice_number: string
   supplier_id: number|null
+  subtotal: number
+  total: number
   /*product_id: number|null
   product_code: string
   product_name: string
